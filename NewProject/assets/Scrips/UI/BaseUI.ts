@@ -1,6 +1,7 @@
 import { constants } from "../constants";
 import { ListenerManager  } from "../Manager/ListenerManager";
 import { UIManager } from "../Manager/UIManager";
+import { Dictionary } from "../Utils/Dictionary";
 
 export interface UIClass<T extends BaseUI> {
     //这是一个泛型接口，里边的是必须可以用类名直接访问的static类型
@@ -29,7 +30,8 @@ export abstract class BaseUI extends cc.Component {
     }
 
     onDestroy(): void {
-        ListenerManager.getInstance().removeAll();
+        cc.log("[BaseUI]:onDestroy");
+        // ListenerManager.getInstance().removeAll();
     }
 
     onShow() {

@@ -13,7 +13,7 @@ export class GameMain extends cc.Component {
     
     onLoad(){
         let frameSize = cc.view.getFrameSize();
-        let bFitHeight = (frameSize.width/frameSize.height) >= 960/640;
+        let bFitHeight = (frameSize.width/frameSize.height) >= 1334/750;
         cc.Canvas.instance.fitHeight = bFitHeight;
         cc.Canvas.instance.fitWidth = !bFitHeight;
 

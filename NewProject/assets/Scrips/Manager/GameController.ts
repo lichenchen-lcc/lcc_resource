@@ -1,4 +1,5 @@
 import { UIManager } from "./UIManager";
+import { TankMapDataManager } from "./TankMapDataManager";
 
 export class GameController {
     private static instance:GameController ;
@@ -18,5 +19,6 @@ export class GameController {
     public initGame() {
         //注册所有监听
         UIManager.getInstance().registerAllListener();
+        TankMapDataManager.getInstance().load("tankMap");
     }
 }

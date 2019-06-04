@@ -13,7 +13,7 @@ export default class FirstCanvas extends cc.Component {
     async start() {   
         ListenerManager.getInstance().dispatch("LoadingUI");
 
-        var item = await this.loadPrefab("Prefabs/item_prefab");
+        var item = await this.loadPrefab("prefabs/item_prefab");
         // cc.log("ff" + item.name);
 
         var content: cc.Node = cc.find("first_canvas/scrollview/view/content");

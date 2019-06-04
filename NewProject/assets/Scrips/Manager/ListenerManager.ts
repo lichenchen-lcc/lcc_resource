@@ -1,3 +1,5 @@
+import { Dictionary } from "../Utils/Dictionary";
+
 //观察者
 export class Delegate {
     //回调
@@ -20,14 +22,14 @@ export class Delegate {
         if (args) {
             this.args = args;
         }
-        this.listener.call(this.caller, this.listener, this.callerName,this.args);
+        this.listener.call(this.caller, this.listener, this.callerName, this.args);
     }
     //比较上下文
     compare(caller): boolean {
         return this.caller == caller;
     }
 
-    public set callerName(name:string){
+    public set callerName(name: string) {
         this.mCallerName = name;
     }
     public get callerName(): string {
@@ -40,7 +42,7 @@ export class ListenerManager {
     //单例
     private static instance: ListenerManager = null;
     //存储当前所有的监听
-    private mListener = {};
+    private mListeners: Dictionary<Delegate[]> = new Dictionary<Delegate[]>();
 
     public static getInstance(): ListenerManager {
         if (this.instance == null) {
@@ -51,33 +53,37 @@ export class ListenerManager {
     //注册
     register(type: string, caller: any, listener: Function, ...args: any[]): void {
         cc.log("ListenerManager.register => className = %s", caller.getUrl());
-        let delegates: Delegate[] = this.mListener[type];
+        let delegates: Delegate[] = this.mListeners.get(type);
         if (!delegates) {
-            this.mListener[type] = [];
+            delegates = [];
         }
         let delegate = new Delegate(caller, listener, ...args);
         //获取名字
         let path = type.split("/");
         let className = path[path.length - 1];
         delegate.callerName = className;
-        this.mListener[type].push(delegate);
+        delegates.push(delegate);
+
+        this.mListeners.add(type, delegates);
     }
     //注册
     registerDelegate(type: string, delegate: Delegate): void {
         cc.log("ListenerManager.registerDelegate");
-        let delegates: Delegate[] = this.mListener[type];
+        let delegates: Delegate[] = this.mListeners.get(type);
         if (!delegates) {
-            this.mListener[type] = [];
+            delegates = [];
         }
         //获取名字
         let path = type.split("/");
         let className = path[path.length - 1];
         delegate.callerName = className;
-        this.mListener[type].push(delegate);
+        delegates.push(delegate);
+
+        this.mListeners.add(type, delegates);
     }
     //发送监听
     dispatch(type: string, ...args: any[]): void {
-        let delegates: Delegate[] = this.mListener[type];
+        let delegates: Delegate[] = this.mListeners.get(type);
         if (delegates == null || delegates.length <= 0) {
             cc.log("[ListenerManager]" + type + ": is empty!![function:dispatch]");
             return;
@@ -89,7 +95,7 @@ export class ListenerManager {
     }
     //删除指定的事件 
     remove(type: string, caller: any, listener: Function) {
-        let delegates: Delegate[] = this.mListener[type];
+        let delegates: Delegate[] = this.mListeners.get(type);
         if (delegates == null || delegates.length <= 0) {
             cc.log("[ListenerManager]" + type + ": is empty!![function:remove]");
             return;
@@ -101,11 +107,12 @@ export class ListenerManager {
             }
         }
         if (delegates.length <= 0) {
-            delete this.mListener[type];
+            this.mListeners.remove(type);
         }
     }
     //删除所有监听
     removeAll() {
-        this.mListener = {};
+        cc.log("[ListenerManager] remove all listener");
+        this.mListeners.clear();
     }
 }

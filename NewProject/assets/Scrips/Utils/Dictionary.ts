@@ -1,7 +1,7 @@
-class Dictionary<T> {
+export class Dictionary<T> {
 	private m_keys: any[] = [];
 	private m_values: T[] = [];
-	private a: T;
+	
 	public get length(): number {
 		return this.m_keys.length;
 	}

@@ -1,12 +1,15 @@
 import { ListenerManager, Delegate } from "../Manager/ListenerManager";
 import { BaseUI, UIClass } from "../UI/BaseUI";
-import { LoadingUI } from "../UI/LoadingUI";
 import { constants } from "../constants";
+import { Dictionary } from "../Utils/Dictionary";
+
+import { LoadingUI } from "../UI/LoadingUI";
+import { MainUI } from "../UI/MainUI";
 
 export class UIManager {
     private static instance: UIManager = null;
     private uiRoot: cc.Node = null;
-    private mUIList: BaseUI[] = [];
+    private mUIList: Dictionary<BaseUI> = new Dictionary<BaseUI>();
     /**
      * static getInstance
      */
@@ -28,7 +31,9 @@ export class UIManager {
     public registerAllListener(): void {
         let listenerManager = ListenerManager.getInstance();
 
+        //注册当前ui监听--用路径  回调只返回类名
         listenerManager.registerDelegate("UI/LoadingUI", this.register(LoadingUI));
+        listenerManager.registerDelegate("UI/MainUI", this.register(MainUI));
     }
 
     public register<T extends BaseUI>(uiClass: UIClass<T>, ...args: any[]): Delegate {
@@ -62,18 +67,27 @@ export class UIManager {
                 return;
             }
             uiScript.tag = className;
-            this.mUIList.push(uiScript);
+            this.mUIList.add(className, uiScript);
             if (callback){
                 callback(args);
             }
         });
     }
     public getUI(className: string): BaseUI {
-        for (let i = 0; i < this.mUIList.length; ++i) {
-            if (this.mUIList[i].tag === className) {
-                return this.mUIList[i];
-            }
+        return this.mUIList.get(className)
+        // for (let i = 0; i < this.mUIList.length; ++i) {
+        //     if (this.mUIList[i].tag === className) {
+        //         return this.mUIList[i];
+        //     }
+        // }
+        // return null;
+    }
+
+    public closeUI(className:string) {
+        let uiScript = this.mUIList.get(className);
+        if (uiScript){
+            uiScript.node.destroy();
+            this.mUIList.remove(className);
         }
-        return null;
     }
 }
