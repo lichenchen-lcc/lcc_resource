@@ -1,4 +1,5 @@
 import { Dictionary } from "../Utils/Dictionary";
+import { BaseUI, UIClass } from "../UI/BaseUI";
 
 //观察者
 export class Delegate {
@@ -51,28 +52,19 @@ export class ListenerManager {
         return this.instance;
     }
     //注册
-    register(type: string, caller: any, listener: Function, ...args: any[]): void {
-        cc.log("ListenerManager.register => className = %s", caller.getUrl());
-        let delegates: Delegate[] = this.mListeners.get(type);
-        if (!delegates) {
-            delegates = [];
-        }
-        let delegate = new Delegate(caller, listener, ...args);
-        //获取名字
-        let path = type.split("/");
-        let className = path[path.length - 1];
-        delegate.callerName = className;
-        delegates.push(delegate);
-
-        this.mListeners.add(type, delegates);
+    private registerDelegate<T extends BaseUI>(uiClass: UIClass<T>, ...args: any[]): Delegate {
+        let nodeScript: T = new uiClass();
+        let delegate = new Delegate(nodeScript, nodeScript.load, ...args);
+        return delegate;
     }
     //注册
-    registerDelegate(type: string, delegate: Delegate): void {
+    public register<T extends BaseUI>(uiClass: UIClass<T>, type: string, ...args: any[]): void {
         cc.log("ListenerManager.registerDelegate");
         let delegates: Delegate[] = this.mListeners.get(type);
         if (!delegates) {
             delegates = [];
         }
+        let delegate = this.registerDelegate(uiClass, args);
         //获取名字
         let path = type.split("/");
         let className = path[path.length - 1];

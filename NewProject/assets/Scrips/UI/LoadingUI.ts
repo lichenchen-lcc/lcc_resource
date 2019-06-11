@@ -24,7 +24,7 @@ export class LoadingUI extends BaseUI {
 
     start(){
         let mySchedule = () => {
-            this.curProgress += 20;
+            this.curProgress += 40;
             this.progressBar.progress = Math.min(this.curProgress / this.progressBar.totalLength, 1);
             this.progressLabel.string = (this.progressBar.progress * 100).toFixed(0) + "%";
             if (this.curProgress >= this.progressBar.totalLength){

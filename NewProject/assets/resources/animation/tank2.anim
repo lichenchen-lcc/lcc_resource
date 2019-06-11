@@ -1,9 +1,31 @@
 {
   "__type__": "cc.AnimationClip",
-  "_name": "",
+  "_name": "tank2",
   "_objFlags": 0,
-  "_duration": 0,
+  "_native": "",
+  "_duration": 0.03333333333333333,
   "sample": 60,
-  "curveData": {},
+  "speed": 0.1,
+  "wrapMode": "2",
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "spriteFrame": [
+          {
+            "frame": 0,
+            "value": {
+              "__uuid__": "7110fe87-30ef-4cec-b7c8-234856530d49"
+            }
+          },
+          {
+            "frame": 0.016666666666666666,
+            "value": {
+              "__uuid__": "79631363-a14f-4909-93a5-efde0f61c7ac"
+            }
+          }
+        ]
+      }
+    }
+  },
   "events": []
 }

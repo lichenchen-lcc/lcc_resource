@@ -25,23 +25,6 @@ export class UIManager {
         this.uiRoot = cc.find("Canvas");
     }
 
-    /**
-     * registerListener
-     */
-    public registerAllListener(): void {
-        let listenerManager = ListenerManager.getInstance();
-
-        //注册当前ui监听--用路径  回调只返回类名
-        listenerManager.registerDelegate("UI/LoadingUI", this.register(LoadingUI));
-        listenerManager.registerDelegate("UI/MainUI", this.register(MainUI));
-    }
-
-    public register<T extends BaseUI>(uiClass: UIClass<T>, ...args: any[]): Delegate {
-        let nodeScript: T = new uiClass();
-        let delegate = new Delegate(nodeScript, nodeScript.load, ...args);
-        return delegate;
-    }
-
     public openUI(className:string,zOrder?:number,callback?:Function,onProgress?:Function,...args:any[]){
         if (this.getUI(className)){
             return;

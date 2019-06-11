@@ -1,6 +1,6 @@
 {
   "__type__": "cc.AnimationClip",
-  "_name": "tank1",
+  "_name": "tank3",
   "_objFlags": 0,
   "_native": "",
   "_duration": 0.03333333333333333,
@@ -14,13 +14,13 @@
           {
             "frame": 0,
             "value": {
-              "__uuid__": "bb634995-8993-4871-ae14-b74493418269"
+              "__uuid__": "7e7932e4-df4f-468f-b44d-6579ce03c2e7"
             }
           },
           {
             "frame": 0.016666666666666666,
             "value": {
-              "__uuid__": "0c0fc98d-903a-4133-8f45-5dbe98e8ffc1"
+              "__uuid__": "3acf2193-dcb1-423f-b02b-7e2b4689217e"
             }
           }
         ]
