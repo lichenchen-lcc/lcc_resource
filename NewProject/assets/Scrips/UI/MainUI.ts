@@ -24,13 +24,15 @@ export class MainUI extends BaseUI {
     private tanks: Array<Tank> = [];
     private tiles: Array<Tile> = [];
     private isTouch: boolean = false;
-    private isMove: boolean = false;
     private direction: number = 0;
 
     onLoad() {
         cc.director.getCollisionManager().enabled = true;
+        cc.director.getCollisionManager().enabledDebugDraw = true;
         cc.director.getPhysicsManager().enabled = true;
         cc.director.getPhysicsManager().gravity = new cc.Vec2(0, 0);
+        cc.director.getPhysicsManager().debugDrawFlags = 1;
+        
         this.isTouch = false;
         //移除LoadingUI
         UIManager.getInstance().closeUI("LoadingUI");
@@ -50,14 +52,15 @@ export class MainUI extends BaseUI {
                 }
             }
         }
-        this.tanks.push(new Tank(this, this.initTankCallback, this.mapLayer));
+        Tank.init(this, this.initTankCallback, this.mapLayer, new cc.Vec2(-30, -360));
     }
 
     initMapCallback(){
 
     }
 
-    initTankCallback() {
+    initTankCallback(callback,tank:Tank) {
+        this.tanks.push(tank);
         this.isTouch = true;
     }
 
@@ -69,15 +72,17 @@ export class MainUI extends BaseUI {
     // }
 
     update(dt) {
-        if (this.isMove) {
-            this.move();
-        }
+        
     }
 
-    move() {
+    action(isMove:boolean) {
         for (let tank of this.tanks) {
             if (tank) {
-                tank.move(this.direction);
+                if (isMove){
+                    tank.move(this.direction);
+                }else{
+                    tank.stopMove();
+                }
             }
         }
     }
@@ -87,14 +92,14 @@ export class MainUI extends BaseUI {
             return;
         }
         this.getDirection(event);
-        this.isMove = true;
+        this.action(true);
     }
 
     directionEnd(event) {
         if (!this.isTouch) {
             return;
         }
-        this.isMove = false;
+        this.action(false);
     }
     /**
      * directionHandler
