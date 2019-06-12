@@ -1,4 +1,5 @@
 import { constants } from "../constants";
+import { AsyncLoadPrefabManager } from "../Manager/AsyncLoadPrefabManager";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -32,6 +33,11 @@ export class Tank extends cc.Component {
 
     onLoad() {
         this.rigidBody = this.getComponent(cc.RigidBody);
+        //子弹
+        let prefab = AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "bullet_prefab");
+        if (prefab) {
+            
+        }
     }
     // 只在两个碰撞体开始接触时被调用一次
     onBeginContact(contact, selfCollider, otherCollider) {
