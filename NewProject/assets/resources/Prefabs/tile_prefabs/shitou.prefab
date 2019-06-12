@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "tile_prefab",
+    "_name": "shitou",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -27,10 +27,13 @@
       },
       {
         "__id__": 4
+      },
+      {
+        "__id__": 5
       }
     ],
     "_prefab": {
-      "__id__": 5
+      "__id__": 6
     },
     "_opacity": 255,
     "_color": {
@@ -85,7 +88,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "10a8b0c9-c08c-4469-87df-b20d84981a4b"
+      "__uuid__": "90f3da44-d6b3-447f-a95b-b8aed68598a6"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -175,14 +178,24 @@
     "_id": ""
   },
   {
+    "__type__": "1e2adzb/IpObZcFz23RBuyR",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_id": ""
+  },
+  {
     "__type__": "cc.PrefabInfo",
     "root": {
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "4590f5a8-52bc-4b7b-96a0-5f33c380125b"
+      "__uuid__": "d44fb4e3-49fc-42da-914d-d6ff00df7ad5"
     },
-    "fileId": "60ouqx071DVbXu5dUSoK9c",
+    "fileId": "f51tRAXbtOs7wzMHcFYqxP",
     "sync": false
   }
 ]

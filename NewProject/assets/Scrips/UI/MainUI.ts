@@ -39,24 +39,35 @@ export class MainUI extends BaseUI {
         let direction_btn = this.menu.getChildByName("direction_btn").getComponent(cc.Button);
         direction_btn.node.on(cc.Node.EventType.TOUCH_START, this.directionStart, this);
         direction_btn.node.on(cc.Node.EventType.TOUCH_END, this.directionEnd, this);
+        
+        Tile.init(this, this.initMapCallback);
+    }
+
+    initMapCallback(){
         //创建地图
         let mapSize = this.mapLayer.getContentSize();
         let tileSize = cc.size(16, 16);
         let values = MapManager.getInstance().values;
         for (let j = 0; j < values.length; j++) {
             for (let i = 0; i < values[j].length; i++) {
-                    cc.log(i + "," + j);
+                //cc.log(i + "," + j);
                 if (values[j][i] > 0) {
-                    let pos = new cc.Vec2(i * (tileSize.width) + tileSize.width / 2 - mapSize.width / 2, -(j * (tileSize.height) + tileSize.height / 2 - mapSize.height / 2 ));
-                    this.tiles.push(new Tile(this, this.initMapCallback,this.mapLayer,pos,values[j][i]));
+                    let pos = new cc.Vec2(i * (tileSize.width) + tileSize.width / 2, mapSize.height - (j * (tileSize.height) + tileSize.height / 2 ));
+                    let constracttemp = Tile.constract[parseInt(values[j][i])];
+                    cc.log(constracttemp);
+                    let prefab: cc.Prefab = Tile.prefabs.get(constracttemp);
+                    if (prefab){
+                        let tile:cc.Node = cc.instantiate(prefab);
+                        tile.parent = this.mapLayer;
+                        tile.setAnchorPoint(0.5,0.5);
+                        tile.setPosition(pos);
+                        let tileScript = tile.getComponent("Tile") as Tile;
+                        this.tiles.push(tileScript);
+                    }
                 }
             }
         }
-        Tank.init(this, this.initTankCallback, this.mapLayer, new cc.Vec2(-30, -360));
-    }
-
-    initMapCallback(){
-
+        Tank.init(this, this.initTankCallback, this.mapLayer, new cc.Vec2(mapSize.width / 2 - tileSize.width * 2, tileSize.height * 1));
     }
 
     initTankCallback(callback,tank:Tank) {
