@@ -1,5 +1,6 @@
 import { constants } from "../constants";
 import { AsyncLoadPrefabManager } from "../Manager/AsyncLoadPrefabManager";
+import { Bullet } from "./Bullet";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -10,8 +11,12 @@ export class Tank extends cc.Component {
 
     //̹tank's speed
     private speed: number = 50;
-    private pos: cc.Vec2;
-    private direction: number = 0;
+    private direction: number = 1;
+
+    //bullet
+    private bulletPrefab:cc.Prefab = null;
+    private bulletTime:number = 1;
+    private bullets:Array<Bullet> = new Array<Bullet>();
 
     public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
         cc.loader.loadRes(constants.PREFAB_UI_DIR + "tank_prefab", cc.Prefab, (err, prefab) => {
@@ -31,32 +36,52 @@ export class Tank extends cc.Component {
         });
     }
 
-    onLoad() {
-        this.rigidBody = this.getComponent(cc.RigidBody);
+    createBullet(){
         //子弹
-        let prefab = AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "bullet_prefab");
-        if (prefab) {
-            
+        if (this.bulletPrefab) {
+            let bullet: cc.Node = cc.instantiate(this.bulletPrefab);
+            bullet.setAnchorPoint(0.5, 0.5);
+            bullet.parent = this.node;
+            let bulletScript = bullet.getComponent("Bullet") as Bullet;
+            this.bullets.push(bulletScript);
+            bulletScript.shot(this.direction,this,this.bulletDestroyCallback);
+        } else {
+            cc.log("bulletpr is null");
         }
+    }
+
+    public bulletDestroyCallback(callback:Function,tag:string){
+        for(let i = 0;i< this.bullets.length;++i){    
+            if (this.bullets[i].tag == tag){
+                cc.log("delete bullet name is %s", tag);
+                this.bullets[i].node.destroy();
+                this.bullets.splice(i,1);
+            }
+        }
+    }
+
+    async onLoad() {
+        this.rigidBody = this.getComponent(cc.RigidBody);
+        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "bullet_prefab");
     }
     // 只在两个碰撞体开始接触时被调用一次
     onBeginContact(contact, selfCollider, otherCollider) {
-        cc.log("1");
+        // cc.log("1");
     }
 
     // 只在两个碰撞体结束接触时被调用一次
     onEndContact(contact, selfCollider, otherCollider) {
-        cc.log("2");
+        // cc.log("2");
     }
 
     // 每次将要处理碰撞体接触逻辑时被调用
     onPreSolve(contact, selfCollider, otherCollider) {
-        cc.log("3");
+        // cc.log("3");
     }
 
     // 每次处理完碰撞体接触逻辑时被调用
     onPostSolve(contact, selfCollider, otherCollider) {
-        cc.log("4");
+        // cc.log("4");
     }
 
     onCollisionEnter(other, self) {
@@ -102,6 +127,13 @@ export class Tank extends cc.Component {
     private changeAnimation() {
         let animation = this.node.getComponent(cc.Animation);
         animation.play("tank" + this.direction);
+    }
+
+    /**
+     * shot
+     */
+    public shot() {
+        this.createBullet();
     }
     /**
      * move

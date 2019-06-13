@@ -39,6 +39,8 @@ export class MainUI extends BaseUI {
         let direction_btn = this.menu.getChildByName("direction_btn").getComponent(cc.Button);
         direction_btn.node.on(cc.Node.EventType.TOUCH_START, this.directionStart, this);
         direction_btn.node.on(cc.Node.EventType.TOUCH_END, this.directionEnd, this);
+        let shot_btn = this.menu.getChildByName("shot_btn").getComponent(cc.Button);
+        shot_btn.node.on(cc.Node.EventType.TOUCH_END, this.shotHandler,this);
         
         Tile.init(this, this.initMapCallback);
     }
@@ -54,7 +56,7 @@ export class MainUI extends BaseUI {
                 if (values[j][i] > 0) {
                     let pos = new cc.Vec2(i * (tileSize.width) + tileSize.width / 2, mapSize.height - (j * (tileSize.height) + tileSize.height / 2 ));
                     let constracttemp = Tile.constract[parseInt(values[j][i])];
-                    cc.log(constracttemp);
+                    // cc.log(constracttemp);
                     let prefab: cc.Prefab = Tile.prefabs.get(constracttemp);
                     if (prefab){
                         let tile:cc.Node = cc.instantiate(prefab);
@@ -84,6 +86,17 @@ export class MainUI extends BaseUI {
 
     update(dt) {
         
+    }
+
+    shotHandler(event){
+        if (!this.isTouch) {
+            return;
+        }
+        for (let tank of this.tanks){
+            if(tank){
+                tank.shot();
+            }
+        }
     }
 
     action(isMove:boolean) {

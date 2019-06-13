@@ -4,9 +4,63 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 export class Bullet extends cc.Component {
-    onLoad(){
-        
+    private offset: number = 15;
+    private speed: number = 80;
+    private rigidBody:cc.RigidBody = null;
+    private direction:number = 1;
+    private caller: any = null;
+    private callback:Function = null;
+
+    private _tag: string = null;
+    public get tag(): string {
+        return this._tag;
+    }
+    public set tag(value: string) {
+        this._tag = value;
     }
 
+    onLoad(){
+        this.rigidBody = this.getComponent(cc.RigidBody);
+        //自动生成tag
+        this.tag = new Date().toString();
+        cc.log("create new bullet ->name is %s" ,this.tag);
+    }
 
+    public shot(direction:number,caller:any,callback:Function){
+        this.caller = caller;
+        this.callback = callback;
+
+        let velocity = cc.v2(0,0);
+        if (direction == 1 ){
+            velocity.y = this.speed;
+            this.node.rotation = 0;
+            this.node.setPosition(cc.v2(0,this.offset));
+        }else if (direction == 2 ){
+            velocity.y = -this.speed;
+            this.node.rotation = 180;
+            this.node.setPosition(cc.v2(0, -this.offset));
+        }else if (direction == 3 ){
+            velocity.x = -this.speed;
+            this.node.rotation = 270;
+            this.node.setPosition(cc.v2(-this.offset,0));
+        }else if (direction == 4){
+            velocity.x = this.speed;
+            this.node.rotation = 90;
+            this.node.setPosition(cc.v2(this.offset, 0));
+        }
+        this.direction = direction;
+        this.rigidBody.linearDamping = 0;
+        this.rigidBody.linearVelocity = velocity;
+    }
+
+    // 只在两个碰撞体开始接触时被调用一次
+    onBeginContact(contact, selfCollider, otherCollider:cc.PhysicsCollider) {
+        //除了玩家坦克和子弹外，都销毁自身
+        if (otherCollider.node.name != "tank_prefab" && otherCollider.node.name != "bullet_prefab"){
+            //提醒坦克当前子弹已经销毁
+            if(this.callback){
+                this.callback.call(this.caller,this.callback,this.tag);
+            }
+        }
+    }
 }

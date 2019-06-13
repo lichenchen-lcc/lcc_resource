@@ -10,14 +10,8 @@ export class AsyncLoadPrefabManager {
         return this._AsyncLoadPrefabManager;
     }
 
-    /**
-     * loadRes
-     */
-    public async loadRes(url:string):Promise<cc.Prefab>{
-        return await this._loadRes(url);
-    }
-    private async _loadRes(url:string):Promise<cc.Prefab> {
-        return new Promise<cc.Prefab>((resolve,reject)=>{
+    public async loadRes(url:string):Promise<cc.Prefab> {
+        let promise = new Promise<cc.Prefab>((resolve,reject)=>{
             cc.loader.loadRes(url,cc.Prefab,(err,prefab)=>{
                 if(!err){
                     resolve(prefab);
@@ -26,5 +20,6 @@ export class AsyncLoadPrefabManager {
                 }
             })
         });
+        return promise;
     }
 }
