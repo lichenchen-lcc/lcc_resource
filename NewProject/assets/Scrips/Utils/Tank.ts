@@ -15,7 +15,8 @@ export class Tank extends cc.Component {
 
     //bullet
     private bulletPrefab:cc.Prefab = null;
-    private bulletTime:number = 1;
+    private bulletTotalTime:number = 0.5;
+    private bulletTime:number = this.bulletTotalTime;
     private bullets:Array<Bullet> = new Array<Bullet>();
 
     public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
@@ -37,6 +38,9 @@ export class Tank extends cc.Component {
     }
 
     createBullet(){
+        if(this.bulletTime < this.bulletTotalTime){
+            return;
+        }
         //子弹
         if (this.bulletPrefab) {
             let bullet: cc.Node = cc.instantiate(this.bulletPrefab);
@@ -45,8 +49,20 @@ export class Tank extends cc.Component {
             let bulletScript = bullet.getComponent("Bullet") as Bullet;
             this.bullets.push(bulletScript);
             bulletScript.shot(this.direction,this,this.bulletDestroyCallback);
+            //启动子弹倒计时
+            this.bulletTime = 0;
+            this.unschedule(this.bulletSchedule);
+            this.schedule(this.bulletSchedule,0.1);
         } else {
             cc.log("bulletpr is null");
+        }
+    }
+     
+    bulletSchedule(){
+        this.bulletTime += 0.1;
+        if (this.bulletTime >= this.bulletTotalTime){
+            this.bulletTime = this.bulletTotalTime;
+            this.unschedule(this.bulletSchedule);
         }
     }
 

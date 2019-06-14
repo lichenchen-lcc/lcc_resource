@@ -7,7 +7,13 @@ export class Tile extends cc.Component{
     private parent: cc.Node;
     private callback: Function;
     private tile: cc.Node;
-    private tileType: number;
+    protected _tileName: string;
+    public get tileName(): string {
+        return this._tileName;
+    }
+    public set tileName(value: string) {
+        this._tileName = value;
+    }
     private tilePos: cc.Vec2;
     public static constract = { 573: "qiang", 339: "caodi", 548: "shitou" };
     public static prefabs: Dictionary<cc.Prefab> = new Dictionary<cc.Prefab>();

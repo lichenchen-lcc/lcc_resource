@@ -5,7 +5,7 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export class Bullet extends cc.Component {
     private offset: number = 15;
-    private speed: number = 80;
+    private speed: number = 100;
     private rigidBody:cc.RigidBody = null;
     private direction:number = 1;
     private caller: any = null;

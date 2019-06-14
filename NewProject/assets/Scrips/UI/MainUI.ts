@@ -15,7 +15,8 @@ export class MainUI extends BaseUI {
 
     protected className = "MainUI";
 
-
+    @property(cc.Node)
+    private hinder:cc.Node = null;
     @property(cc.Node)
     private mapLayer: cc.Node;
     @property(cc.Node)
@@ -41,8 +42,15 @@ export class MainUI extends BaseUI {
         direction_btn.node.on(cc.Node.EventType.TOUCH_END, this.directionEnd, this);
         let shot_btn = this.menu.getChildByName("shot_btn").getComponent(cc.Button);
         shot_btn.node.on(cc.Node.EventType.TOUCH_END, this.shotHandler,this);
-        
+        //加载地图图块
         Tile.init(this, this.initMapCallback);
+        //生成墙
+        this.initHinder();
+    }
+
+    initHinder(){
+        let mapSize = this.mapLayer.getContentSize();
+        
     }
 
     initMapCallback(){
@@ -64,6 +72,7 @@ export class MainUI extends BaseUI {
                         tile.setAnchorPoint(0.5,0.5);
                         tile.setPosition(pos);
                         let tileScript = tile.getComponent("Tile") as Tile;
+                        tileScript.name = constracttemp;
                         this.tiles.push(tileScript);
                     }
                 }
