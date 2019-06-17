@@ -21,9 +21,6 @@ export class Bullet extends cc.Component {
 
     onLoad(){
         this.rigidBody = this.getComponent(cc.RigidBody);
-        //自动生成tag
-        this.tag = new Date().toString();
-        cc.log("create new bullet ->name is %s" ,this.tag);
     }
 
     public shot(direction:number,caller:any,callback:Function){

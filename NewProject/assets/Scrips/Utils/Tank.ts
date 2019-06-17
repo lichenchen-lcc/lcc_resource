@@ -18,6 +18,7 @@ export class Tank extends cc.Component {
     private bulletTotalTime:number = 0.5;
     private bulletTime:number = this.bulletTotalTime;
     private bullets:Array<Bullet> = new Array<Bullet>();
+    private bulletIndex:number = 0;
 
     public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
         cc.loader.loadRes(constants.PREFAB_UI_DIR + "tank_prefab", cc.Prefab, (err, prefab) => {
@@ -47,6 +48,12 @@ export class Tank extends cc.Component {
             bullet.setAnchorPoint(0.5, 0.5);
             bullet.parent = this.node;
             let bulletScript = bullet.getComponent("Bullet") as Bullet;
+            bulletScript.tag = "tank_bullet_" + this.bulletIndex;
+            this.bulletIndex += 1;
+            if (this.bulletIndex >= 10000){
+                this.bulletIndex = 0;
+            }
+            cc.log("create:" + bulletScript.tag);
             this.bullets.push(bulletScript);
             bulletScript.shot(this.direction,this,this.bulletDestroyCallback);
             //启动子弹倒计时
@@ -69,7 +76,7 @@ export class Tank extends cc.Component {
     public bulletDestroyCallback(callback:Function,tag:string){
         for(let i = 0;i< this.bullets.length;++i){    
             if (this.bullets[i].tag == tag){
-                cc.log("delete bullet name is %s", tag);
+                cc.log("delete:%s", tag);
                 this.bullets[i].node.destroy();
                 this.bullets.splice(i,1);
             }

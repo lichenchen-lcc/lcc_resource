@@ -6,6 +6,7 @@ import { constants } from "../constants";
 import { Tank } from "../Utils/Tank";
 import { MapManager } from "../Manager/MapManager";
 import { Tile } from "../Utils/Tile";
+import { EnemyManager } from "../Manager/EnemyManager";
 
 
 const { ccclass, property } = cc._decorator;
@@ -83,6 +84,7 @@ export class MainUI extends BaseUI {
 
     initTankCallback(callback,tank:Tank) {
         this.tanks.push(tank);
+        EnemyManager.getInstance().createrEnemy(1,this.mapLayer, this.mapLayer.getContentSize());
         this.isTouch = true;
     }
 
