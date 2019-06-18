@@ -19,13 +19,7 @@ export abstract class Enemy extends cc.Component {
     protected bulletTime: number = this.bulletTotalTime;
     protected bullets: Array<Bullet> = new Array<Bullet>();
     protected bulletIndex:number = 0;
-
-    public get direction(): number {
-        return this._direction;
-    }
-    public set direction(value: number) {
-        this._direction = value;
-    }
+    protected _bulletOffset: number = 15;
 
     protected onLoad() {
         this.rigidBody = this.getComponent(cc.RigidBody);
@@ -34,6 +28,20 @@ export abstract class Enemy extends cc.Component {
         this.schedule(this.shotSchedule,0.1);
     }
 
+    protected update(){
+        if(this.rigidBody){
+            //如果速度等于0后也要换方向
+            if (this.rigidBody.linearVelocity.x == 0 && this.rigidBody.linearVelocity.y == 0){
+                let newDirect = Math.floor(Math.random() * 4 + 1)
+                if (newDirect == this.direction) {
+                    this.direction = (newDirect + 2 - 1) % 4 + 1;
+                } else {
+                    this.direction = newDirect;
+                }
+                this.autoMove();
+            }
+        }
+    }
     /**
      * initDestroyCallback    */
     public initDestroyCallback(caller:any,callback:Function) {
@@ -49,7 +57,7 @@ export abstract class Enemy extends cc.Component {
                 this.callback.call(this.caller,this.callback,this.tag);
             }
         }else{
-            this.node.runAction(cc.blink(2,4));
+            // this.node.runAction(cc.blink(2,4));
         }
     }
 
@@ -64,13 +72,36 @@ export abstract class Enemy extends cc.Component {
             }
         }else{
             let newDirect = Math.floor(Math.random() * 4 + 1)
-            if (newDirect == this.direction){
-                this.direction = (newDirect +  1)%4;
-            }else{
+            if (newDirect == this.direction) {
+                this.direction = (newDirect + 2 - 1) % 4 + 1;
+            } else {
                 this.direction = newDirect;
             }
             this.autoMove();
         }
+    }
+
+    // // 只在两个碰撞体结束接触时被调用一次
+    // protected onEndContact(contact, selfCollider, otherCollider: cc.PhysicsCollider) {
+    //     if (otherCollider.node.name != "bullet_prefab") {
+    //         let newDirect = Math.floor(Math.random() * 4 + 1)
+    //         if (newDirect == this.direction) {
+    //             this.direction = (newDirect + 1) % 4;
+    //         } else {
+    //             this.direction = newDirect;
+    //         }
+    //         this.autoMove();
+    //     }
+    // }
+
+    // 每次将要处理碰撞体接触逻辑时被调用
+    protected onPreSolve(contact, selfCollider, otherCollider) {
+        // cc.log("3");
+    }
+
+    // 每次处理完碰撞体接触逻辑时被调用
+    protected onPostSolve(contact, selfCollider, otherCollider) {
+        // cc.log("4");
     }
 
     protected changeAnimation() {
@@ -117,6 +148,7 @@ export abstract class Enemy extends cc.Component {
             bullet.parent = this.node;
             let bulletScript = bullet.getComponent("Bullet") as Bullet;
             bulletScript.tag = "enemy_bullet_" + this.bulletIndex;
+            bulletScript.offset = this.bulletOffset;
             cc.log("create:" + bulletScript.tag);
             this.bulletIndex += 1;
             if(this.bulletIndex >= 10000){
@@ -168,6 +200,19 @@ export abstract class Enemy extends cc.Component {
     }
     public set speed(value: number) {
         this._speed = value;
+    }
+    public get bulletOffset(): number {
+        return this._bulletOffset;
+    }
+    public set bulletOffset(value: number) {
+        this._bulletOffset = value;
+    }
+
+    public get direction(): number {
+        return this._direction;
+    }
+    public set direction(value: number) {
+        this._direction = value;
     }
 
     protected onDestroy(){

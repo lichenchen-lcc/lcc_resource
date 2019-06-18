@@ -4,7 +4,7 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 export class Bullet extends cc.Component {
-    private offset: number = 15;
+    private _offset: number = 20;
     private speed: number = 100;
     private rigidBody:cc.RigidBody = null;
     private direction:number = 1;
@@ -53,11 +53,18 @@ export class Bullet extends cc.Component {
     // 只在两个碰撞体开始接触时被调用一次
     onBeginContact(contact, selfCollider, otherCollider:cc.PhysicsCollider) {
         //除了玩家坦克和子弹外，都销毁自身
-        if (otherCollider.node.name != "tank_prefab" && otherCollider.node.name != "bullet_prefab"){
-            //提醒坦克当前子弹已经销毁
-            if(this.callback){
-                this.callback.call(this.caller,this.callback,this.tag);
-            }
+        //提醒坦克当前子弹已经销毁
+        if(this.callback){
+            this.callback.call(this.caller,this.callback,this.tag);
         }
+        // if (otherCollider.node.name != "tank_prefab"){
+        // }
+    }
+
+    public get offset(): number {
+        return this._offset;
+    }
+    public set offset(value: number) {
+        this._offset = value;
     }
 }
