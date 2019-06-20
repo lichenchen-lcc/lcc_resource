@@ -83,8 +83,9 @@ export class MainUI extends BaseUI {
     }
 
     initTankCallback(callback,tank:Tank) {
+        tank.parent = this.mapLayer;
         this.tanks.push(tank);
-        EnemyManager.getInstance().createrEnemy(1,this.mapLayer, this.mapLayer.getContentSize());
+        // EnemyManager.getInstance().createrEnemy(1,this.mapLayer, this.mapLayer.getContentSize());
         this.isTouch = true;
     }
 

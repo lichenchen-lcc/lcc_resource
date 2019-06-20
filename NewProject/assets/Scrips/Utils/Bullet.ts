@@ -57,8 +57,6 @@ export class Bullet extends cc.Component {
         if(this.callback){
             this.callback.call(this.caller,this.callback,this.tag);
         }
-        // if (otherCollider.node.name != "tank_prefab"){
-        // }
     }
 
     public get offset(): number {
