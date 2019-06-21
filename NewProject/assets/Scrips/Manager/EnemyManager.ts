@@ -11,7 +11,7 @@ export class EnemyManager {
 
     private bornPos: Array<cc.Vec2> = [cc.v2(0, 0), cc.v2(0, 0), cc.v2(0, 0)];
     private mapSize: cc.Size = null;
-    private offset: number = 32;
+    private offset: number = 15;
     private parent: cc.Node = null;
     /**
      * static getInstance
@@ -25,12 +25,13 @@ export class EnemyManager {
 
     private initBornPos() {
         if (this.mapSize) {
-            this.bornPos[0].x = this.offset;
-            this.bornPos[0].y = this.mapSize.height - this.offset;
-            this.bornPos[1].x = this.mapSize.width / 2;
-            this.bornPos[1].y = this.mapSize.height - this.offset;
-            this.bornPos[2].x = this.mapSize.width - this.offset;
-            this.bornPos[2].y = this.mapSize.height - this.offset;
+            this.bornPos[0] = new cc.Vec2(this.mapSize.width / 2 - 16 * 2,16 * 1)
+            // this.bornPos[0].x = this.offset;
+            // this.bornPos[0].y = this.mapSize.height - this.offset;
+            // this.bornPos[1].x = this.mapSize.width / 2;
+            // this.bornPos[1].y = this.mapSize.height - this.offset;
+            // this.bornPos[2].x = this.mapSize.width - this.offset;
+            // this.bornPos[2].y = this.mapSize.height - this.offset;
         }
     }
     private getRandEnemy(): string {
@@ -64,7 +65,6 @@ export class EnemyManager {
     }
 
     private creater(url: string) {
-        cc.log(constants.ENEMY_PREFAB + url);
         cc.loader.loadRes(constants.ENEMY_PREFAB + url, cc.Prefab, (err, prefab) => {
             if (!err) {
                 let enemy: cc.Node = cc.instantiate(prefab);

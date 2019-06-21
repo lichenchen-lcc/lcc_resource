@@ -19,6 +19,7 @@ export class Tank extends cc.Component {
     private bulletTime: number = this.bulletTotalTime;
     private bullets: Array<Bullet> = new Array<Bullet>();
     private bulletIndex: number = 0;
+    private bulletSpeed:number = 8;
 
     public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
         cc.loader.loadRes(constants.PREFAB_UI_DIR + "Tank", cc.Prefab, (err, prefab) => {
@@ -49,6 +50,7 @@ export class Tank extends cc.Component {
             bullet.parent = this.node;
             let bulletScript = bullet.getComponent("Bullet") as Bullet;
             bulletScript.tag = "tank_bullet_" + this.bulletIndex;
+            bulletScript.speed = this.bulletSpeed;
             this.bulletIndex += 1;
             if (this.bulletIndex >= 10000) {
                 this.bulletIndex = 0;
@@ -84,26 +86,8 @@ export class Tank extends cc.Component {
     }
 
     async onLoad() {
-        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "bullet_prefab");
-    }
-    // 只在两个碰撞体开始接触时被调用一次
-    onBeginContact(contact, selfCollider, otherCollider) {
-        // cc.log("1");
-    }
-
-    // 只在两个碰撞体结束接触时被调用一次
-    onEndContact(contact, selfCollider, otherCollider) {
-        // cc.log("2");
-    }
-
-    // 每次将要处理碰撞体接触逻辑时被调用
-    onPreSolve(contact, selfCollider, otherCollider) {
-        // cc.log("3");
-    }
-
-    // 每次处理完碰撞体接触逻辑时被调用
-    onPostSolve(contact, selfCollider, otherCollider) {
-        // cc.log("4");
+        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "Bullet");
+        this.schedule(this.tankSchedule,0.02);
     }
 
     onCollisionEnter(other, self) {
@@ -157,7 +141,7 @@ export class Tank extends cc.Component {
         this.createBullet();
     }
 
-    update() {
+    tankSchedule() {
         if (this.isMove) {
             let mapSize = this.parent.getContentSize();
             let tankSize = this.node.getContentSize();
@@ -213,5 +197,9 @@ export class Tank extends cc.Component {
     }
     public set parent(value: cc.Node) {
         this._parent = value;
+    }
+
+    onDestroy(){
+        this.unschedule(this.tankSchedule);
     }
 }

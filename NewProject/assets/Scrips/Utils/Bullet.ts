@@ -5,57 +5,59 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export class Bullet extends cc.Component {
     private _offset: number = 20;
-    private speed: number = 100;
-    private rigidBody:cc.RigidBody = null;
+    private _speed: number = 10;
+    
     private direction:number = 1;
     private caller: any = null;
     private callback:Function = null;
-
     private _tag: string = null;
-    public get tag(): string {
-        return this._tag;
-    }
-    public set tag(value: string) {
-        this._tag = value;
-    }
+    private isMove = false;
 
     onLoad(){
-        this.rigidBody = this.getComponent(cc.RigidBody);
+        
+    }
+    
+    update(){
+        if(this.isMove){
+            if (this.direction == 1) {
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.speed);
+            } else if (this.direction == 2) {
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.speed);
+            } else if (this.direction == 3) {
+                this.node.position = cc.v2(this.node.position.x - this.speed, this.node.position.y);
+            } else if (this.direction == 4) {
+                this.node.position = cc.v2(this.node.position.x + this.speed, this.node.position.y);
+            }
+        }
     }
 
     public shot(direction:number,caller:any,callback:Function){
         this.caller = caller;
         this.callback = callback;
 
-        let velocity = cc.v2(0,0);
         if (direction == 1 ){
-            velocity.y = this.speed;
             this.node.rotation = 0;
             this.node.setPosition(cc.v2(0,this.offset));
         }else if (direction == 2 ){
-            velocity.y = -this.speed;
             this.node.rotation = 180;
             this.node.setPosition(cc.v2(0, -this.offset));
         }else if (direction == 3 ){
-            velocity.x = -this.speed;
             this.node.rotation = 270;
             this.node.setPosition(cc.v2(-this.offset,0));
         }else if (direction == 4){
-            velocity.x = this.speed;
             this.node.rotation = 90;
             this.node.setPosition(cc.v2(this.offset, 0));
         }
         this.direction = direction;
-        this.rigidBody.linearDamping = 0;
-        this.rigidBody.linearVelocity = velocity;
+        this.isMove = true;
     }
 
     // 只在两个碰撞体开始接触时被调用一次
-    onBeginContact(contact, selfCollider, otherCollider:cc.PhysicsCollider) {
-        //除了玩家坦克和子弹外，都销毁自身
-        //提醒坦克当前子弹已经销毁
-        if(this.callback){
-            this.callback.call(this.caller,this.callback,this.tag);
+    onCollisionEnter(other, self){
+        if (other.node.name != "caodi"){
+            if(this.callback){
+                this.callback.call(this.caller,this.callback,this.tag);
+            }
         }
     }
 
@@ -64,5 +66,17 @@ export class Bullet extends cc.Component {
     }
     public set offset(value: number) {
         this._offset = value;
+    }
+    public get tag(): string {
+        return this._tag;
+    }
+    public set tag(value: string) {
+        this._tag = value;
+    }
+    public get speed(): number {
+        return this._speed;
+    }
+    public set speed(value: number) {
+        this._speed = value;
     }
 }
