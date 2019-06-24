@@ -15,7 +15,7 @@ export class QiangTile extends Tile {
                 //延后消失，眼睛看不出来，因为里可以消失会让子弹卡顿一下
                 this.scheduleOnce(()=>{
                     this.node.destroy();
-                },0.08);
+                },0.1);
             }
         }
     }

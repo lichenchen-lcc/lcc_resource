@@ -25,13 +25,12 @@ export class EnemyManager {
 
     private initBornPos() {
         if (this.mapSize) {
-            this.bornPos[0] = new cc.Vec2(this.mapSize.width / 2 - 16 * 2,16 * 1)
-            // this.bornPos[0].x = this.offset;
-            // this.bornPos[0].y = this.mapSize.height - this.offset;
-            // this.bornPos[1].x = this.mapSize.width / 2;
-            // this.bornPos[1].y = this.mapSize.height - this.offset;
-            // this.bornPos[2].x = this.mapSize.width - this.offset;
-            // this.bornPos[2].y = this.mapSize.height - this.offset;
+            this.bornPos[0].x = this.offset;
+            this.bornPos[0].y = this.mapSize.height - this.offset;
+            this.bornPos[1].x = this.mapSize.width / 2;
+            this.bornPos[1].y = this.mapSize.height - this.offset;
+            this.bornPos[2].x = this.mapSize.width - this.offset;
+            this.bornPos[2].y = this.mapSize.height - this.offset;
         }
     }
     private getRandEnemy(): string {

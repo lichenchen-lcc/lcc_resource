@@ -11,6 +11,7 @@ export abstract class Enemy extends cc.Component {
     private _direction: number = 2;
     private _preDirection: number = this.direction;
     private _elastic = 4;
+    private isMove = true;
     protected caller: any = null;
     protected callback: Function = null;
     //bullet
@@ -44,7 +45,10 @@ export abstract class Enemy extends cc.Component {
         }
     }
     protected move() {
-        cc.log("----------"+this.direction);
+        if(!this.isMove){
+            return;
+        }
+        // cc.log("----------"+this.direction);
         if (this.direction == 1) {
             this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.speed);
         } else if (this.direction == 2) {
@@ -91,60 +95,75 @@ export abstract class Enemy extends cc.Component {
                 this.injured();
             }
         } else if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou" || otherName == "hinder"){
-            cc.log("peng zhuang le "  + this.direction);
-            this.elasticF();
-            this.turnd();
+            if (this.isMove){
+                this.isMove = false;
+                cc.log("peng zhuang le :" + otherName +":" + this.direction);
+                this.elasticF(other);
+                this.turnd();
+            }
         }
     }
-    //回弹
-    protected elasticF(){
-        if (this.direction == 1) {
-            this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
-        } else if (this.direction == 2) {
-            this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
-        } else if (this.direction == 3) {
-            this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
-        } else if (this.direction == 4) {
-            this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
-        }
-        // //形成回弹系数
-        // let otherSize: cc.Size = other.node.getContentSize();
-        // let otherPos: cc.Vec2 = other.node.position;
-        // let selfSize: cc.Size = this.node.getContentSize();
-        // let selfPos: cc.Vec2 = this.node.position;
-        // let distance = 0;
-        // let curDis = 0;
-        // cc.log("----" + this.node.position.x + "," + this.node.position.y);
-        // if (this.direction == 1) {
-        //     distance = otherSize.height / 2 + selfSize.height / 2;
-        //     curDis = Math.abs(otherPos.y - selfPos.y);
-        //     if (distance > curDis) {
-        //         this.elastic = Math.abs(distance - curDis);
-        //         this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
-        //     }
-        // } else if (this.direction == 2) {
-        //     distance = otherSize.height / 2 + selfSize.height / 2;
-        //     curDis = Math.abs(otherPos.y - selfPos.y);
-        //     if (distance > curDis) {
-        //         this.elastic = Math.abs(distance - curDis);
-        //         this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
-        //     }
-        // } else if (this.direction == 3) {
-        //     distance = otherSize.height / 2 + selfSize.height / 2;
-        //     curDis = Math.abs(otherPos.y - selfPos.y);
-        //     if (distance > curDis) {
-        //         this.elastic = Math.abs(distance - curDis);
-        //         this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
-        //     }
-        // } else if (this.direction == 4) {
-        //     distance = otherSize.height / 2 + selfSize.height / 2;
-        //     curDis = Math.abs(otherPos.y - selfPos.y);
-        //     if (distance > curDis) {
-        //         this.elastic = Math.abs(distance - curDis);
-        //         this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
-        //     }
+
+    protected onCollisionExit(other, self){
+        this.isMove = true;
+        // let otherName = other.node.name;
+        // if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou" || otherName == "hinder") {
+
         // }
-        // cc.log("*****" + this.node.position.x + "," + this.node.position.y);
+    }
+    //回弹
+    protected elasticF(other){
+        // if (this.direction == 1) {
+        //     this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
+        // } else if (this.direction == 2) {
+        //     this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
+        // } else if (this.direction == 3) {
+        //     this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
+        // } else if (this.direction == 4) {
+        //     this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
+        // }
+        //形成回弹系数
+        let otherSize: cc.Size = other.node.getContentSize();
+        let otherPos: cc.Vec2 = other.node.position;
+        let selfSize: cc.Size = this.node.getContentSize();
+        let selfPos: cc.Vec2 = this.node.position;
+        let distance = 0;
+        let curDis = 0;
+        cc.log("selfPos:" + selfPos.x + "," + selfPos.y);
+        cc.log("otherPos:" + otherPos.x + "," + otherPos.y);
+        cc.log("selfSize:" + selfSize.width + "<" + selfSize.height);
+        cc.log("otherSize:" + otherSize.width + "<" + otherSize.height);
+        if (this.direction == 1) {
+            distance = otherSize.height / 2 + selfSize.height / 2;
+            curDis = Math.abs(otherPos.y - selfPos.y);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis) + 1;
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
+            }
+        } else if (this.direction == 2) {
+            distance = otherSize.height / 2 + selfSize.height / 2;
+            curDis = Math.abs(otherPos.y - selfPos.y);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis) + 1;
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
+            }
+        } else if (this.direction == 3) {
+            distance = otherSize.width / 2 + selfSize.width / 2;
+            curDis = Math.abs(otherPos.x - selfPos.x);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis) + 1;
+                this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
+            }
+        } else if (this.direction == 4) {
+            distance = otherSize.width / 2 + selfSize.width / 2;
+            curDis = Math.abs(otherPos.x - selfPos.x);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis) + 1;
+                this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
+            }
+        }
+        cc.log("distance:" + distance + " curDis:" + curDis + " this.elastic:" + this.elastic);
+        cc.log("*****" + this.node.position.x + "," + this.node.position.y);
     }
     //掉头
     protected turnd(){
