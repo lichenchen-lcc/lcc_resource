@@ -17,7 +17,7 @@ export class MainUI extends BaseUI {
     protected className = "MainUI";
 
     @property(cc.Node)
-    private hinder:cc.Node = null;
+    private hinder: cc.Node = null;
     @property(cc.Node)
     private mapLayer: cc.Node;
     @property(cc.Node)
@@ -30,11 +30,13 @@ export class MainUI extends BaseUI {
 
     onLoad() {
         cc.director.getCollisionManager().enabled = true;
-        cc.director.getCollisionManager().enabledDebugDraw = true;
-        cc.director.getPhysicsManager().enabled = true;
-        cc.director.getPhysicsManager().gravity = new cc.Vec2(0, 0);
-        cc.director.getPhysicsManager().debugDrawFlags = 1;
-        
+        // cc.director.getCollisionManager().enabledDebugDraw = true;
+        // cc.director.getPhysicsManager().enabled = true;
+        // cc.director.getPhysicsManager().gravity = new cc.Vec2(0, 0);
+        // cc.director.getPhysicsManager().debugDrawFlags = 1;
+
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         this.isTouch = false;
         //移除LoadingUI
         UIManager.getInstance().closeUI("LoadingUI");
@@ -42,19 +44,19 @@ export class MainUI extends BaseUI {
         direction_btn.node.on(cc.Node.EventType.TOUCH_START, this.directionStart, this);
         direction_btn.node.on(cc.Node.EventType.TOUCH_END, this.directionEnd, this);
         let shot_btn = this.menu.getChildByName("shot_btn").getComponent(cc.Button);
-        shot_btn.node.on(cc.Node.EventType.TOUCH_END, this.shotHandler,this);
+        shot_btn.node.on(cc.Node.EventType.TOUCH_END, this.shotHandler, this);
         //加载地图图块
         Tile.init(this, this.initMapCallback);
         //生成墙
         this.initHinder();
     }
 
-    initHinder(){
+    initHinder() {
         let mapSize = this.mapLayer.getContentSize();
-        
+
     }
 
-    initMapCallback(){
+    initMapCallback() {
         //创建地图
         let mapSize = this.mapLayer.getContentSize();
         let tileSize = cc.size(16, 16);
@@ -63,14 +65,14 @@ export class MainUI extends BaseUI {
             for (let i = 0; i < values[j].length; i++) {
                 //cc.log(i + "," + j);
                 if (values[j][i] > 0) {
-                    let pos = new cc.Vec2(i * (tileSize.width) + tileSize.width / 2, mapSize.height - (j * (tileSize.height) + tileSize.height / 2 ));
+                    let pos = new cc.Vec2(i * (tileSize.width) + tileSize.width / 2, mapSize.height - (j * (tileSize.height) + tileSize.height / 2));
                     let constracttemp = Tile.constract[parseInt(values[j][i])];
                     // cc.log(constracttemp);
                     let prefab: cc.Prefab = Tile.prefabs.get(constracttemp);
-                    if (prefab){
-                        let tile:cc.Node = cc.instantiate(prefab);
+                    if (prefab) {
+                        let tile: cc.Node = cc.instantiate(prefab);
                         tile.parent = this.mapLayer;
-                        tile.setAnchorPoint(0.5,0.5);
+                        tile.setAnchorPoint(0.5, 0.5);
                         tile.setPosition(pos);
                         let tileScript = tile.getComponent("Tile") as Tile;
                         tileScript.name = constracttemp;
@@ -82,10 +84,10 @@ export class MainUI extends BaseUI {
         Tank.init(this, this.initTankCallback, this.mapLayer, new cc.Vec2(mapSize.width / 2 - tileSize.width * 2, tileSize.height * 1));
     }
 
-    initTankCallback(callback,tank:Tank) {
+    initTankCallback(callback, tank: Tank) {
         tank.parent = this.mapLayer;
         this.tanks.push(tank);
-        EnemyManager.getInstance().createrEnemy(1,this.mapLayer, this.mapLayer.getContentSize());
+        EnemyManager.getInstance().createrEnemy(5, this.mapLayer, this.mapLayer.getContentSize());
         this.isTouch = true;
     }
 
@@ -97,29 +99,64 @@ export class MainUI extends BaseUI {
     // }
 
     update(dt) {
-        
+
     }
 
-    shotHandler(event){
+    shotHandler(event) {
         if (!this.isTouch) {
             return;
         }
-        for (let tank of this.tanks){
-            if(tank){
+        for (let tank of this.tanks) {
+            if (tank) {
                 tank.shot();
             }
         }
     }
 
-    action(isMove:boolean) {
+    action(isMove: boolean) {
         for (let tank of this.tanks) {
             if (tank) {
-                if (isMove){
+                if (isMove) {
                     tank.move(this.direction);
-                }else{
+                } else {
                     tank.stopMove();
                 }
             }
+        }
+    }
+
+    onKeyDown(event) {
+        switch (event.keyCode) {
+            case cc.macro.KEY.w:
+                this.direction = 1;
+                this.action(true);
+                break;
+
+            case cc.macro.KEY.s:
+                this.direction = 2;
+                this.action(true);
+                break;
+
+            case cc.macro.KEY.a:
+                this.direction = 3;
+                this.action(true);
+                break;
+
+            case cc.macro.KEY.d:
+                this.direction = 4;
+                this.action(true);
+                break;
+
+            case cc.macro.KEY.j:
+                break;
+        }
+    }
+
+    onKeyUp(event) {
+        if (event.keyCode == cc.macro.KEY.j) {
+
+        } else {
+            this.action(false);
         }
     }
 

@@ -10,7 +10,6 @@ export class HeavyEnemy extends Enemy {
         this.blood = 10;
         this.bulletOffset = 25;
         this.bulletTotalTime = 8;
-        this.elastic = 4;
         this.bulletSpeed = 3;
         super.onLoad();
     }

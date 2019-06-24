@@ -22,7 +22,7 @@ export abstract class Enemy extends cc.Component {
     protected bullets: Array<Bullet> = new Array<Bullet>();
     protected bulletIndex: number = 0;
     private _bulletSpeed: number = 8;
-    private _bulletOffset: number = 15;
+    private _bulletOffset: number = 25;
 
     protected onLoad() {
         this.schedule(this.enemySchedule, 0.02);
@@ -88,7 +88,7 @@ export abstract class Enemy extends cc.Component {
     protected onCollisionEnter(other, self) {
         //只要不是子弹就掉头if () {
         let otherName = other.node.name;
-        if (otherName == "bullet_prefab") {
+        if (otherName == "Bullet") {
             //是否是玩家坦克子弹
             let bulletScript = other.getComponent("Bullet") as Bullet;
             if (bulletScript.tag.split("_")[0] == "tank") {
@@ -100,6 +100,12 @@ export abstract class Enemy extends cc.Component {
                 cc.log("peng zhuang le :" + otherName +":" + this.direction);
                 this.elasticF(other);
                 this.turnd();
+            }
+        } else if (otherName == "Tank"){
+            //碰撞了玩家坦克后不会反弹、不会掉头，会直接停止
+            if (this.isMove) {
+                this.isMove = false;
+                cc.log("peng zhuang le :" + otherName + ":" + this.direction);
             }
         }
     }
@@ -159,7 +165,7 @@ export abstract class Enemy extends cc.Component {
 
     protected changeAnimation() {
         let animation = this.node.getComponent(cc.Animation);
-        animation.play("heavy_enemy_" + this.direction);
+        animation.play(this.node.name + "_" + this.direction);
     }
     /**
      * autoShot
@@ -188,7 +194,7 @@ export abstract class Enemy extends cc.Component {
     public bulletDestroyCallback(callback: Function, tag: string) {
         for (let i = 0; i < this.bullets.length; ++i) {
             if (this.bullets[i].tag == tag) {
-                cc.log("delete:%s", tag);
+                // cc.log("delete:%s", tag);
                 this.bullets[i].node.destroy();
                 this.bullets.splice(i, 1);
             }

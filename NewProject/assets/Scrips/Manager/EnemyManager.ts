@@ -2,7 +2,7 @@ import { Dictionary } from "../Utils/Dictionary";
 import { Enemy } from "../Enemy/Enemy";
 import { constants } from "../constants";
 
-enum EnemyType { "HeavyEnemy", "count" = 1 };
+enum EnemyType { "HeavyEnemy", "SpeedEnemy","count" = 2 };
 
 export class EnemyManager {
     private static instance: EnemyManager = null;

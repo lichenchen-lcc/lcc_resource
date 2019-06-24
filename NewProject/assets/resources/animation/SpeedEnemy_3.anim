@@ -1,0 +1,31 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "speed_enemy_3",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.02,
+  "sample": 100,
+  "speed": 0.1,
+  "wrapMode": "2",
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "spriteFrame": [
+          {
+            "frame": 0,
+            "value": {
+              "__uuid__": "6be758e6-3435-40f9-9e0e-33b97f2cf752"
+            }
+          },
+          {
+            "frame": 0.01,
+            "value": {
+              "__uuid__": "9daded3c-39c1-414f-9aae-381576480935"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "events": []
+}

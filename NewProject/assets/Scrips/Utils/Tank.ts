@@ -78,7 +78,7 @@ export class Tank extends cc.Component {
     public bulletDestroyCallback(callback: Function, tag: string) {
         for (let i = 0; i < this.bullets.length; ++i) {
             if (this.bullets[i].tag == tag) {
-                cc.log("delete:%s", tag);
+                // cc.log("delete:%s", tag);
                 this.bullets[i].node.destroy();
                 this.bullets.splice(i, 1);
             }
@@ -91,14 +91,20 @@ export class Tank extends cc.Component {
     }
 
     onCollisionEnter(other, self) {
-        cc.log("tank is collision" + other.node.name);
-        let otherName = other.node.name;
+        // cc.log("tank is collision" + other.node.name);
+        let otherName:string = other.node.name;
         if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou") {
             this.isMove = false;
             if (!this.isCollision){
                 this.isCollision = true;
                 //回弹
                 this.elasticF(other);
+            }
+        } else if (otherName.indexOf("Enemy") >= 0){
+            //碰到敌人后不反弹
+            this.isMove = false;
+            if (!this.isCollision) {
+                this.isCollision = true;
             }
         }
     }
@@ -185,7 +191,6 @@ export class Tank extends cc.Component {
             } else if (this.direction == 4) {
                 this.node.position = cc.v2(Math.min((this.node.position.x + this.speed), mapSize.width - tankSize.width / 2), this.node.position.y);
             }
-            // cc.log(" move ... " + this.node.position.x + "," + this.node.position.y);
         }
     }
     /**
