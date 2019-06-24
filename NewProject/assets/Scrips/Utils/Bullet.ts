@@ -1,4 +1,5 @@
 import { constants } from "../constants";
+import { QiangTile } from "./QiangTile";
 
 const {ccclass, property} = cc._decorator;
 
@@ -58,6 +59,11 @@ export class Bullet extends cc.Component {
             if(this.callback){
                 this.callback.call(this.caller,this.callback,this.tag);
             }
+            //销毁墙放在这里，因为写在墙里会卡顿
+            // if (other.node.name == "qiang"){
+            //     let tile = other.getComponent("QiangTile") as QiangTile;
+            //     tile.injured();
+            // }
         }
     }
 

@@ -106,22 +106,9 @@ export abstract class Enemy extends cc.Component {
 
     protected onCollisionExit(other, self){
         this.isMove = true;
-        // let otherName = other.node.name;
-        // if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou" || otherName == "hinder") {
-
-        // }
     }
     //回弹
     protected elasticF(other){
-        // if (this.direction == 1) {
-        //     this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
-        // } else if (this.direction == 2) {
-        //     this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
-        // } else if (this.direction == 3) {
-        //     this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
-        // } else if (this.direction == 4) {
-        //     this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
-        // }
         //形成回弹系数
         let otherSize: cc.Size = other.node.getContentSize();
         let otherPos: cc.Vec2 = other.node.position;
@@ -129,10 +116,6 @@ export abstract class Enemy extends cc.Component {
         let selfPos: cc.Vec2 = this.node.position;
         let distance = 0;
         let curDis = 0;
-        cc.log("selfPos:" + selfPos.x + "," + selfPos.y);
-        cc.log("otherPos:" + otherPos.x + "," + otherPos.y);
-        cc.log("selfSize:" + selfSize.width + "<" + selfSize.height);
-        cc.log("otherSize:" + otherSize.width + "<" + otherSize.height);
         if (this.direction == 1) {
             distance = otherSize.height / 2 + selfSize.height / 2;
             curDis = Math.abs(otherPos.y - selfPos.y);
@@ -162,8 +145,6 @@ export abstract class Enemy extends cc.Component {
                 this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
             }
         }
-        cc.log("distance:" + distance + " curDis:" + curDis + " this.elastic:" + this.elastic);
-        cc.log("*****" + this.node.position.x + "," + this.node.position.y);
     }
     //掉头
     protected turnd(){

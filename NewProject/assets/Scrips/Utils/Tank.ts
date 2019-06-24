@@ -8,7 +8,7 @@ export class Tank extends cc.Component {
     private bornPos = new cc.Vec2(-30, -360);
     private _parent: cc.Node;
     //̹tank's speed
-    private speed: number = 5;
+    private speed: number = 3;
     private direction: number = 1;
     private isMove = false;
     private isCollision = false;//是否碰撞
@@ -95,18 +95,49 @@ export class Tank extends cc.Component {
         let otherName = other.node.name;
         if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou") {
             this.isMove = false;
-            this.isCollision = true;
-            //回弹
-            let mapSize = this.parent.getContentSize();
-            let tankSize = this.node.getContentSize();
-            if (this.direction == 1) {
-                this.node.position = cc.v2(this.node.position.x, Math.min((this.node.position.y - this.elastic), mapSize.height - tankSize.height / 2));
-            } else if (this.direction == 2) {
-                this.node.position = cc.v2(this.node.position.x, Math.max((this.node.position.y + this.elastic), tankSize.height / 2));
-            } else if (this.direction == 3) {
-                this.node.position = cc.v2(Math.max((this.node.position.x + this.elastic), tankSize.width / 2), this.node.position.y);
-            } else if (this.direction == 4) {
-                this.node.position = cc.v2(Math.min((this.node.position.x - this.elastic), mapSize.width - tankSize.width / 2), this.node.position.y);
+            if (!this.isCollision){
+                this.isCollision = true;
+                //回弹
+                this.elasticF(other);
+            }
+        }
+    }
+    //回弹
+    private elasticF(other) {
+        //形成回弹系数
+        let otherSize: cc.Size = other.node.getContentSize();
+        let otherPos: cc.Vec2 = other.node.position;
+        let selfSize: cc.Size = this.node.getContentSize();
+        let selfPos: cc.Vec2 = this.node.position;
+        let distance = 0;
+        let curDis = 0;
+        if (this.direction == 1) {
+            distance = otherSize.height / 2 + selfSize.height / 2;
+            curDis = Math.abs(otherPos.y - selfPos.y);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis);
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y - this.elastic);
+            }
+        } else if (this.direction == 2) {
+            distance = otherSize.height / 2 + selfSize.height / 2;
+            curDis = Math.abs(otherPos.y - selfPos.y);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis);
+                this.node.position = cc.v2(this.node.position.x, this.node.position.y + this.elastic);
+            }
+        } else if (this.direction == 3) {
+            distance = otherSize.width / 2 + selfSize.width / 2;
+            curDis = Math.abs(otherPos.x - selfPos.x);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis);
+                this.node.position = cc.v2(this.node.position.x + this.elastic, this.node.position.y);
+            }
+        } else if (this.direction == 4) {
+            distance = otherSize.width / 2 + selfSize.width / 2;
+            curDis = Math.abs(otherPos.x - selfPos.x);
+            if (distance > curDis) {
+                this.elastic = Math.abs(distance - curDis);
+                this.node.position = cc.v2(this.node.position.x - this.elastic, this.node.position.y);
             }
         }
     }
@@ -126,7 +157,7 @@ export class Tank extends cc.Component {
      * @param  {Collider} self  产生碰撞的自身的碰撞组件
      */
     onCollisionExit(other, self) {
-        
+        this.isCollision = false;
     }
 
     private changeAnimation() {
