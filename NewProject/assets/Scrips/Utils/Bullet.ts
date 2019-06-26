@@ -1,5 +1,6 @@
 import { constants } from "../constants";
 import { QiangTile } from "./QiangTile";
+import { BulletManager } from "../Manager/BulletManager";
 
 const {ccclass, property} = cc._decorator;
 
@@ -9,8 +10,6 @@ export class Bullet extends cc.Component {
     private _speed: number = 10;
     
     private direction:number = 1;
-    private caller: any = null;
-    private callback:Function = null;
     private _tag: string = null;
     private isMove = false;
 
@@ -32,9 +31,7 @@ export class Bullet extends cc.Component {
         }
     }
 
-    public shot(direction:number,caller:any,callback:Function){
-        this.caller = caller;
-        this.callback = callback;
+    public shot(direction:number){
 
         if (direction == 1 ){
             this.node.rotation = 0;
@@ -56,9 +53,7 @@ export class Bullet extends cc.Component {
     // 只在两个碰撞体开始接触时被调用一次
     onCollisionEnter(other, self){
         if (other.node.name != "caodi"){
-            if(this.callback){
-                this.callback.call(this.caller,this.callback,this.tag);
-            }
+            BulletManager.getInstance().destroyBullet(this.node);
             //销毁墙放在这里，因为写在墙里会卡顿
             // if (other.node.name == "qiang"){
             //     let tile = other.getComponent("QiangTile") as QiangTile;

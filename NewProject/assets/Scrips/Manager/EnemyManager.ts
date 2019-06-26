@@ -1,8 +1,9 @@
 import { Dictionary } from "../Utils/Dictionary";
 import { Enemy } from "../Enemy/Enemy";
 import { constants } from "../constants";
+import { AsyncLoadPrefabManager } from "./AsyncLoadPrefabManager";
 
-enum EnemyType { "HeavyEnemy", "SpeedEnemy","count" = 2 };
+enum EnemyType { "HeavyEnemy", "SpeedEnemy", "count" = 2 };
 
 export class EnemyManager {
     private static instance: EnemyManager = null;
@@ -12,7 +13,7 @@ export class EnemyManager {
     private bornPos: Array<cc.Vec2> = [cc.v2(0, 0), cc.v2(0, 0), cc.v2(0, 0)];
     private mapSize: cc.Size = null;
     private offset: number = 15;
-    private parent: cc.Node = null;
+    private parent: cc.Node = null;    
     /**
      * static getInstance
      */
@@ -40,7 +41,7 @@ export class EnemyManager {
     /**
      * createrEnemy
      */
-    public createrEnemy(num: number, parent: cc.Node ,mapSize?: cc.Size) {
+    public createrEnemy(num: number, parent: cc.Node, mapSize?: cc.Size) {
         if (mapSize) {
             this.mapSize = mapSize;
             this.initBornPos();
@@ -94,4 +95,6 @@ export class EnemyManager {
         let index = Math.floor(Math.random() * (this.bornPos.length) + 1);
         return this.bornPos[index - 1];
     }
+
+
 }

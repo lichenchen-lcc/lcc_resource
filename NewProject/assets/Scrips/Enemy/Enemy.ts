@@ -1,4 +1,5 @@
 import { Bullet } from "../Utils/Bullet";
+import { BulletManager } from "../Manager/BulletManager";
 
 
 const { ccclass, property } = cc._decorator;
@@ -19,8 +20,6 @@ export abstract class Enemy extends cc.Component {
     protected bulletPrefab: cc.Prefab = null;
     protected bulletTotalTime: number = 0.5;
     protected bulletTime: number = this.bulletTotalTime;
-    protected bullets: Array<Bullet> = new Array<Bullet>();
-    protected bulletIndex: number = 0;
     private _bulletSpeed: number = 8;
     private _bulletOffset: number = 25;
 
@@ -97,7 +96,7 @@ export abstract class Enemy extends cc.Component {
         } else if (otherName == "haiyang" || otherName == "qiang" || otherName == "shitou" || otherName == "hinder"){
             if (this.isMove){
                 this.isMove = false;
-                cc.log("peng zhuang le :" + otherName +":" + this.direction);
+                // cc.log("peng zhuang le :" + otherName +":" + this.direction);
                 this.elasticF(other);
                 this.turnd();
             }
@@ -105,7 +104,7 @@ export abstract class Enemy extends cc.Component {
             //碰撞了玩家坦克后不会反弹、不会掉头，会直接停止
             if (this.isMove) {
                 this.isMove = false;
-                cc.log("peng zhuang le :" + otherName + ":" + this.direction);
+                // cc.log("peng zhuang le :" + otherName + ":" + this.direction);
             }
         }
     }
@@ -174,29 +173,17 @@ export abstract class Enemy extends cc.Component {
         this.bulletTime = 0;
         //子弹
         if (this.bulletPrefab) {
-            let bullet: cc.Node = cc.instantiate(this.bulletPrefab);
-            bullet.setAnchorPoint(0.5, 0.5);
-            bullet.parent = this.node;
-            let bulletScript = bullet.getComponent("Bullet") as Bullet;
-            bulletScript.tag = "enemy_bullet_" + this.bulletIndex;
-            bulletScript.offset = this.bulletOffset;
-            bulletScript.speed = this.bulletSpeed;
-            cc.log("create:" + bulletScript.tag);
-            this.bulletIndex += 1;
-            if (this.bulletIndex >= 10000) {
-                this.bulletIndex = 0;
-            }
-            this.bullets.push(bulletScript);
-            bulletScript.shot(this.direction, this, this.bulletDestroyCallback);
-        }
-    }
-
-    public bulletDestroyCallback(callback: Function, tag: string) {
-        for (let i = 0; i < this.bullets.length; ++i) {
-            if (this.bullets[i].tag == tag) {
-                // cc.log("delete:%s", tag);
-                this.bullets[i].node.destroy();
-                this.bullets.splice(i, 1);
+            let bullet: cc.Node = BulletManager.getInstance().createBullet();
+            if (bullet){
+                bullet.setAnchorPoint(0.5, 0.5);
+                bullet.parent = this.node;
+                let bulletScript = bullet.getComponent("Bullet") as Bullet;
+                bulletScript.tag = "enemy_bullet";
+                bulletScript.offset = this.bulletOffset;
+                bulletScript.speed = this.bulletSpeed;
+                bulletScript.shot(this.direction);
+            }else{
+                cc.log("8888888888888888888888");
             }
         }
     }
@@ -259,12 +246,5 @@ export abstract class Enemy extends cc.Component {
 
     protected onDestroy() {
         this.unschedule(this.enemySchedule);
-        //销毁当前的子弹
-        if (this.bullets.length > 0) {
-            for (let bullet of this.bullets) {
-                bullet.node.destroy();
-            }
-            this.bullets = null;
-        }
     }
 }

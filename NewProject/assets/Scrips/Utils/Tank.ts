@@ -1,6 +1,7 @@
 import { constants } from "../constants";
 import { AsyncLoadPrefabManager } from "../Manager/AsyncLoadPrefabManager";
 import { Bullet } from "./Bullet";
+import { BulletManager } from "../Manager/BulletManager";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -17,9 +18,8 @@ export class Tank extends cc.Component {
     private bulletPrefab: cc.Prefab = null;
     private bulletTotalTime: number = 0.5;
     private bulletTime: number = this.bulletTotalTime;
-    private bullets: Array<Bullet> = new Array<Bullet>();
-    private bulletIndex: number = 0;
     private bulletSpeed:number = 8;
+    private bulletPool:cc.NodePool = null;
 
     public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
         cc.loader.loadRes(constants.PREFAB_UI_DIR + "Tank", cc.Prefab, (err, prefab) => {
@@ -45,19 +45,13 @@ export class Tank extends cc.Component {
         }
         //子弹
         if (this.bulletPrefab) {
-            let bullet: cc.Node = cc.instantiate(this.bulletPrefab);
+            let bullet: cc.Node = BulletManager.getInstance().createBullet();
             bullet.setAnchorPoint(0.5, 0.5);
             bullet.parent = this.node;
             let bulletScript = bullet.getComponent("Bullet") as Bullet;
-            bulletScript.tag = "tank_bullet_" + this.bulletIndex;
+            bulletScript.tag = "tank_bullet";
             bulletScript.speed = this.bulletSpeed;
-            this.bulletIndex += 1;
-            if (this.bulletIndex >= 10000) {
-                this.bulletIndex = 0;
-            }
-            cc.log("create:" + bulletScript.tag);
-            this.bullets.push(bulletScript);
-            bulletScript.shot(this.direction, this, this.bulletDestroyCallback);
+            bulletScript.shot(this.direction);
             //启动子弹倒计时
             this.bulletTime = 0;
             this.unschedule(this.bulletSchedule);
@@ -75,18 +69,9 @@ export class Tank extends cc.Component {
         }
     }
 
-    public bulletDestroyCallback(callback: Function, tag: string) {
-        for (let i = 0; i < this.bullets.length; ++i) {
-            if (this.bullets[i].tag == tag) {
-                // cc.log("delete:%s", tag);
-                this.bullets[i].node.destroy();
-                this.bullets.splice(i, 1);
-            }
-        }
-    }
-
     async onLoad() {
         this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "Bullet");
+        this.bulletPool = new cc.NodePool();
         this.schedule(this.tankSchedule,0.02);
     }
 
@@ -237,5 +222,6 @@ export class Tank extends cc.Component {
 
     onDestroy(){
         this.unschedule(this.tankSchedule);
+        this.bulletPool.clear();
     }
 }

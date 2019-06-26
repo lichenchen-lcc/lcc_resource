@@ -7,6 +7,7 @@ import { Tank } from "../Utils/Tank";
 import { MapManager } from "../Manager/MapManager";
 import { Tile } from "../Utils/Tile";
 import { EnemyManager } from "../Manager/EnemyManager";
+import { BulletManager } from "../Manager/BulletManager";
 
 
 const { ccclass, property } = cc._decorator;
@@ -34,7 +35,7 @@ export class MainUI extends BaseUI {
         // cc.director.getPhysicsManager().enabled = true;
         // cc.director.getPhysicsManager().gravity = new cc.Vec2(0, 0);
         // cc.director.getPhysicsManager().debugDrawFlags = 1;
-
+        BulletManager.getInstance();
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         this.isTouch = false;
@@ -209,5 +210,6 @@ export class MainUI extends BaseUI {
     onDestroy() {
         cc.director.getCollisionManager().enabled = false;
         cc.director.getPhysicsManager().enabled = false;
+        BulletManager.getInstance().clear();
     }
 }
