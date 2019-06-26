@@ -60,7 +60,7 @@ export class MainUI extends BaseUI {
     initMapCallback() {
         //创建地图
         let mapSize = this.mapLayer.getContentSize();
-        let tileSize = cc.size(16, 16);
+        let tileSize = cc.size(32, 32);
         let values = MapManager.getInstance().values;
         for (let j = 0; j < values.length; j++) {
             for (let i = 0; i < values[j].length; i++) {

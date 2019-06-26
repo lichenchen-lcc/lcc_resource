@@ -15,7 +15,7 @@ export class Tile extends cc.Component{
         this._tileName = value;
     }
     private tilePos: cc.Vec2;
-    public static constract = { 573: "qiang", 339: "caodi", 548: "shitou" };
+    public static constract = { 2: "qiang", 1: "caodi", 6: "shitou" };
     public static prefabs: Dictionary<cc.Prefab> = new Dictionary<cc.Prefab>();
 
     public static init(caller: any, callback: Function) {

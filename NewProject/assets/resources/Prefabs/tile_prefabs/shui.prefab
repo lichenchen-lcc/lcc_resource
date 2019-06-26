@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "haiyang",
+    "_name": "shui",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -42,8 +42,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 16,
-      "height": 16
+      "width": 32,
+      "height": 32
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -85,7 +85,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "52dc54c1-1a6b-4076-a22e-36fef6cee003"
+      "__uuid__": "2b1e8d9d-a13d-45bc-b654-5c9a08f4fe94"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -99,9 +99,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_state": 0,
-    "_atlas": {
-      "__uuid__": "f23321fd-0aa7-415b-942e-3421befe805e"
-    },
+    "_atlas": null,
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_id": ""
@@ -132,8 +130,8 @@
     },
     "_size": {
       "__type__": "cc.Size",
-      "width": 16,
-      "height": 16
+      "width": 32,
+      "height": 32
     },
     "_id": ""
   },
