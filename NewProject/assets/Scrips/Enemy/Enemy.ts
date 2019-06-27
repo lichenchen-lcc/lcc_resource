@@ -13,6 +13,7 @@ export abstract class Enemy extends cc.Component {
     private _preDirection: number = this.direction;
     private _elastic = 4;
     private isMove = true;
+    private _scheduleInterval = 0.02;
     protected caller: any = null;
     protected callback: Function = null;
     //bullet
@@ -24,7 +25,7 @@ export abstract class Enemy extends cc.Component {
     private _bulletOffset: number = 25;
 
     protected onLoad() {
-        this.schedule(this.enemySchedule, 0.02);
+        this.schedule(this.enemySchedule, this.scheduleInterval);
     }
     /**
      * enemySchedule
@@ -103,8 +104,30 @@ export abstract class Enemy extends cc.Component {
         } else if (otherName == "Tank"){
             //碰撞了玩家坦克后不会反弹、不会掉头，会直接停止
             if (this.isMove) {
-                this.isMove = false;
-                // cc.log("peng zhuang le :" + otherName + ":" + this.direction);
+                //判断 玩家坦克在哪个方向
+                let selfPos = this.node.position;
+                let otherPos = other.node.position;
+                let selfSize = this.node.getContentSize();
+                let otherSize = other.node.getContentSize();
+                let direction = 0;
+                if (Math.abs(otherPos.y - selfPos.y) >= Math.abs(otherPos.x - selfPos.x)){
+                    if (otherPos.y - selfPos.y >= 0){
+                        direction = 1;
+                    }else{
+                        direction = 2;
+                    }
+                }else{
+                    if (otherPos.x - selfPos.x >= 0){
+                        direction = 4;
+                    }else{
+                        direction = 3;
+                    }
+                }
+                if (this.direction == direction){
+                    this.isMove = false;
+                    // this.elasticF(other);
+                    // this.turnd();
+                }
             }
         }
     }
@@ -166,6 +189,11 @@ export abstract class Enemy extends cc.Component {
         let animation = this.node.getComponent(cc.Animation);
         animation.play(this.node.name + "_" + this.direction);
     }
+
+    protected stopAnimation(){
+        let animation = this.node.getComponent(cc.Animation);
+        animation.stop(this.node.name + "_" + this.direction);
+    }
     /**
      * autoShot
      */
@@ -186,6 +214,12 @@ export abstract class Enemy extends cc.Component {
                 cc.log("8888888888888888888888");
             }
         }
+    }
+    public get scheduleInterval() {
+        return this._scheduleInterval;
+    }
+    public set scheduleInterval(value) {
+        this._scheduleInterval = value;
     }
 
     public get tag(): string {

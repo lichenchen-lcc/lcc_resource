@@ -3,8 +3,6 @@ import { Enemy } from "../Enemy/Enemy";
 import { constants } from "../constants";
 import { AsyncLoadPrefabManager } from "./AsyncLoadPrefabManager";
 
-enum EnemyType { "HeavyEnemy", "SpeedEnemy", "count" = 2 };
-
 export class EnemyManager {
     private static instance: EnemyManager = null;
     private enemys: Array<Enemy> = new Array<Enemy>();
@@ -13,7 +11,9 @@ export class EnemyManager {
     private bornPos: Array<cc.Vec2> = [cc.v2(0, 0), cc.v2(0, 0), cc.v2(0, 0)];
     private mapSize: cc.Size = null;
     private offset: number = 15;
-    private parent: cc.Node = null;    
+    private parent: cc.Node = null; 
+
+    private EnemyType = ["HeavyEnemy", "SpeedEnemy", "JumpEnemy"];  
     /**
      * static getInstance
      */
@@ -35,8 +35,8 @@ export class EnemyManager {
         }
     }
     private getRandEnemy(): string {
-        let index = Math.floor(Math.random() * (EnemyType.count) + 1);
-        return EnemyType[index - 1];
+        let index = Math.floor(Math.random() * (this.EnemyType.length) + 1);
+        return this.EnemyType[index - 1];
     }
     /**
      * createrEnemy
@@ -55,7 +55,7 @@ export class EnemyManager {
     /**
      * createrEnemyByType
      */
-    public createrEnemyByType(type: EnemyType, parent: cc.Node, mapSize?: cc.Size) {
+    public createrEnemyByType(type: string, parent: cc.Node, mapSize?: cc.Size) {
         if (mapSize) {
             this.mapSize = mapSize;
             this.initBornPos();
