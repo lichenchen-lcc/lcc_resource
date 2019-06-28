@@ -190,12 +190,12 @@ export class Tank extends cc.Component {
             this.direction = direction;
             this.changeAnimation();
             this.isMove = true;
-            cc.log("start move");
+            // cc.log("start move");
         } else {
             this.direction = direction;
             this.changeAnimation();
             this.isMove = true;
-            cc.log("start move");
+            // cc.log("start move");
         }
     }
     /**
@@ -203,7 +203,7 @@ export class Tank extends cc.Component {
      */
     public stopMove() {
         this.isMove = false;
-        cc.log("end move");
+        // cc.log("end move");
     }
 
     /**

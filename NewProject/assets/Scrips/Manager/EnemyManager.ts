@@ -5,15 +5,14 @@ import { AsyncLoadPrefabManager } from "./AsyncLoadPrefabManager";
 
 export class EnemyManager {
     private static instance: EnemyManager = null;
-    private enemys: Array<Enemy> = new Array<Enemy>();
-    private enemyIndex: number = 0;
 
     private bornPos: Array<cc.Vec2> = [cc.v2(0, 0), cc.v2(0, 0), cc.v2(0, 0)];
     private mapSize: cc.Size = null;
     private offset: number = 15;
-    private parent: cc.Node = null; 
+    private parent: cc.Node = null;
+    private poolDic: Dictionary<cc.NodePool> = new Dictionary<cc.NodePool>();
 
-    private EnemyType = ["HeavyEnemy", "SpeedEnemy", "JumpEnemy"];  
+    private EnemyType = ["HeavyEnemy", "SpeedEnemy", "JumpEnemy"];
     /**
      * static getInstance
      */
@@ -65,30 +64,46 @@ export class EnemyManager {
     }
 
     private creater(url: string) {
-        cc.loader.loadRes(constants.ENEMY_PREFAB + url, cc.Prefab, (err, prefab) => {
-            if (!err) {
-                let enemy: cc.Node = cc.instantiate(prefab);
-                enemy.position = this.getRandPos();
-                enemy.parent = this.parent;
-                let enemyScript = enemy.getComponent(url) as Enemy;
-                this.enemys.push(enemyScript);
-                enemyScript.initDestroyCallback(this, this.enemyDestroyCallback);
-                enemyScript.tag = url + this.enemyIndex;
-                cc.log("create enemy:" + enemyScript.tag);
-            } else {
-                cc.log("load %s is error", url);
-            }
-        });
+        let enemy: cc.Node = null;
+        //得到对应的对象池
+        let enemyPool: cc.NodePool = this.poolDic.get(url);
+        if (enemyPool == null) {
+            // cc.log(url + "is empty");
+            enemyPool = new cc.NodePool();
+            this.poolDic.add(url, enemyPool);
+        }
+        if (enemyPool.size() > 0) {
+            enemy = enemyPool.get();
+            enemy.position = this.getRandPos();
+            enemy.parent = this.parent;
+            let enemyScript = enemy.getComponent(url) as Enemy;
+            enemyScript.tag = url;
+            cc.log("create enemy:" + enemyScript.tag);
+        } else {
+            cc.loader.loadRes(constants.ENEMY_PREFAB + url, cc.Prefab, (err, prefab) => {
+                if (!err) {
+                    enemy = cc.instantiate(prefab);
+                    enemy.position = this.getRandPos();
+                    enemy.parent = this.parent;
+                    let enemyScript = enemy.getComponent(url) as Enemy;
+                    enemyScript.tag = url;
+                    cc.log("create enemy:" + enemyScript.tag);
+                } else {
+                    cc.log("load %s is error", url);
+                }
+            });
+        }
     }
 
-    private enemyDestroyCallback(callback: Function, tag: string) {
-        for (let i = 0; i <= this.enemys.length; ++i) {
-            if (this.enemys[i].tag == tag) {
-                cc.log("delete enemy:" + tag);
-                this.enemys[i].destroy();
-                this.enemys.splice(i, 1);
-            }
+    public enemyDestroyCallback(tag: string, node: cc.Node) {
+        cc.log("zibao2");
+        cc.log(node.name);
+        let pool: cc.NodePool = this.poolDic.get(tag);
+        cc.log(this.poolDic.length);
+        if (pool == null){
+            cc.log("pool is null");
         }
+        pool.put(node);
     }
 
     private getRandPos(): cc.Vec2 {
@@ -96,5 +111,14 @@ export class EnemyManager {
         return this.bornPos[index - 1];
     }
 
-
+    /**
+     * clear
+     */
+    public clear() {
+        for (let pool of this.poolDic.values){
+            if (pool != null){
+                pool.clear();
+            }
+        } 
+    }
 }

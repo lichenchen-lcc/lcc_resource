@@ -1,5 +1,6 @@
 import { Bullet } from "../Utils/Bullet";
 import { BulletManager } from "../Manager/BulletManager";
+import { EnemyManager } from "../Manager/EnemyManager";
 
 
 const { ccclass, property } = cc._decorator;
@@ -7,30 +8,46 @@ const { ccclass, property } = cc._decorator;
 export abstract class Enemy extends cc.Component {
     private _className: string = "Enemy";
     private _tag: string = "";
-    private _blood: number = 5;
+    private _maxBlood: number = 5;
+    private _blood: number = this.maxBlood;
     private _speed: number = 3;
     private _direction: number = 2;
     private _preDirection: number = this.direction;
     private _elastic = 4;
-    private isMove = true;
+    private _isMove = true;
     private _scheduleInterval = 0.02;
     protected caller: any = null;
     protected callback: Function = null;
     //bullet
     @property(cc.Prefab)
     protected bulletPrefab: cc.Prefab = null;
+    @property(cc.ProgressBar)
+    protected bloodProgress: cc.ProgressBar = null;
+    @property(cc.Animation)
+    protected animation: cc.Animation = null;
     protected bulletTotalTime: number = 0.5;
     protected bulletTime: number = this.bulletTotalTime;
     private _bulletSpeed: number = 8;
     private _bulletOffset: number = 25;
 
     protected onLoad() {
+        this.preDirection = this.direction;
+        this.blood = this.maxBlood;
         this.schedule(this.enemySchedule, this.scheduleInterval);
+        this.updateBloodProgress();
+    }
+
+    protected updateBloodProgress(){
+        if(this.bloodProgress){
+            // cc.log(this.blood + "," + this.maxBlood);
+            this.bloodProgress.progress = this.blood / this.maxBlood;
+        }
     }
     /**
      * enemySchedule
      */
     protected enemySchedule() {
+        // cc.log("enemySchedule");
         //移动
         if (this.direction != this.preDirection) {
             this.preDirection = this.direction;
@@ -65,22 +82,14 @@ export abstract class Enemy extends cc.Component {
             this.turnd();
         }
     }
-    /**
-     * initDestroyCallback    */
-    public initDestroyCallback(caller: any, callback: Function) {
-        this.caller = caller;
-        this.callback = callback;
-    }
 
     protected injured() {
         this.blood -= 1;
         if (this.blood <= 0) {
             //敌人死亡,死亡回调
-            if (this.callback) {
-                this.callback.call(this.caller, this.callback, this.tag);
-            }
+            EnemyManager.getInstance().enemyDestroyCallback(this.tag,this.node);
         } else {
-            this.node.runAction(cc.blink(2,4));
+            this.updateBloodProgress();
         }
     }
 
@@ -102,6 +111,10 @@ export abstract class Enemy extends cc.Component {
                 this.turnd();
             }
         } else if (otherName == "Tank"){
+            if (this.detonate){
+                //坦克自爆
+                this.detonate();
+            }
             //碰撞了玩家坦克后不会反弹、不会掉头，会直接停止
             if (this.isMove) {
                 //判断 玩家坦克在哪个方向
@@ -132,7 +145,12 @@ export abstract class Enemy extends cc.Component {
         }
     }
 
+    protected detonate(){
+
+    }
+
     protected onCollisionExit(other, self){
+        // cc.log("onCollisionExit");
         this.isMove = true;
     }
     //回弹
@@ -186,13 +204,15 @@ export abstract class Enemy extends cc.Component {
     }
 
     protected changeAnimation() {
-        let animation = this.node.getComponent(cc.Animation);
-        animation.play(this.node.name + "_" + this.direction);
+        if (this.animation){
+            this.animation.play(this.node.name + "_" + this.direction);
+        }
     }
 
     protected stopAnimation(){
-        let animation = this.node.getComponent(cc.Animation);
-        animation.stop(this.node.name + "_" + this.direction);
+        if (this.animation) {
+            this.animation.stop(this.node.name + "_" + this.direction);
+        }
     }
     /**
      * autoShot
@@ -214,6 +234,18 @@ export abstract class Enemy extends cc.Component {
                 cc.log("8888888888888888888888");
             }
         }
+    }
+    public get maxBlood(): number {
+        return this._maxBlood;
+    }
+    public set maxBlood(value: number) {
+        this._maxBlood = value;
+    }
+    public get isMove() {
+        return this._isMove;
+    }
+    public set isMove(value) {
+        this._isMove = value;
     }
     public get scheduleInterval() {
         return this._scheduleInterval;

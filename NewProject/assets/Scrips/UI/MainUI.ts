@@ -88,8 +88,8 @@ export class MainUI extends BaseUI {
     initTankCallback(callback, tank: Tank) {
         tank.parent = this.mapLayer;
         this.tanks.push(tank);
-        // EnemyManager.getInstance().createrEnemy(5, this.mapLayer, this.mapLayer.getContentSize());
-        EnemyManager.getInstance().createrEnemyByType("JumpEnemy", this.mapLayer, this.mapLayer.getContentSize());
+        EnemyManager.getInstance().createrEnemy(5, this.mapLayer, this.mapLayer.getContentSize());
+        // EnemyManager.getInstance().createrEnemyByType("JumpEnemy", this.mapLayer, this.mapLayer.getContentSize());
         this.isTouch = true;
     }
 
@@ -212,5 +212,6 @@ export class MainUI extends BaseUI {
         cc.director.getCollisionManager().enabled = false;
         cc.director.getPhysicsManager().enabled = false;
         BulletManager.getInstance().clear();
+        EnemyManager.getInstance().clear();
     }
 }
