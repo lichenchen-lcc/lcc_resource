@@ -2,12 +2,12 @@ import { constants } from "../constants";
 import { AsyncLoadPrefabManager } from "../Manager/AsyncLoadPrefabManager";
 import { Bullet } from "./Bullet";
 import { BulletManager } from "../Manager/BulletManager";
+import { ScoreManager } from "../Manager/ScoreManager";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
 export class Tank extends cc.Component {
     private bornPos = new cc.Vec2(-30, -360);
-    private _parent: cc.Node;
     //̹tank's speed
     private speed: number = 3;
     private direction: number = 1;
@@ -21,22 +21,63 @@ export class Tank extends cc.Component {
     private bulletSpeed:number = 8;
     private bulletPool:cc.NodePool = null;
 
-    public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
-        cc.loader.loadRes(constants.PREFAB_UI_DIR + "Tank", cc.Prefab, (err, prefab) => {
-            if (!err) {
-                let tankPlayer = cc.instantiate(prefab);
+    private maxBlood:number = 10;
+    private blood:number = this.maxBlood;
+    private tankBlood:cc.ScrollView = null;
 
-                tankPlayer.parent = parent;
+    public static init(caller: any, callback: Function, parent: cc.Node, bornPos?: cc.Vec2) {
+        cc.loader.loadRes(constants.PREFAB_DIR + "Tank", cc.Prefab, (err, prefab) => {
+            if (!err) {
+                let tank = cc.instantiate(prefab);
+
+                tank.parent = parent;
                 if (bornPos) {
-                    tankPlayer.position = bornPos;
+                    tank.position = bornPos;
                 }
                 if (callback) {
-                    callback.call(caller, callback, tankPlayer.getComponent("Tank") as Tank);
+                    callback.call(caller, callback, tank.getComponent("Tank"));
                 }
             } else {
                 cc.log("load tank error");
             }
         });
+    }
+    /**
+     * injured
+     */
+    public injured() {
+        this.blood -= 1;
+        ScoreManager.getInstance().playerBlood = this.blood;
+        this.tankBloodChange();
+        if (this.blood <= 0 ){
+            cc.log("you  die ");
+            this.node.destroy();
+            return;
+        }
+    }
+
+    tankBloodChange(tankBlood?: cc.ScrollView) {
+        let content: cc.Node = null;
+        if (tankBlood){
+            content = tankBlood.content;
+            if(this.tankBlood == null){
+                this.tankBlood = tankBlood;
+            }
+        }else{
+            content = this.tankBlood.content;
+        }
+        let baseBlood: cc.Node = content.getChildByName("blood1");
+        for (let i = 1; i <= this.maxBlood; i++) {
+            let child: cc.Node = content.getChildByName("blood" + i);
+            if (child == null) {
+                child = cc.instantiate(baseBlood);
+                content.addChild(child);
+                child.name = "blood" + i;
+            }
+            if (i > this.blood) {
+                child.color = cc.Color.BLACK;
+            }
+        }
     }
 
     createBullet() {
@@ -70,7 +111,7 @@ export class Tank extends cc.Component {
     }
 
     async onLoad() {
-        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "Bullet");
+        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_DIR + "Bullet");
         this.bulletPool = new cc.NodePool();
         this.schedule(this.tankSchedule,0.02);
     }
@@ -90,6 +131,12 @@ export class Tank extends cc.Component {
             this.isMove = false;
             if (!this.isCollision) {
                 this.isCollision = true;
+            }
+        }else if(otherName == "Bullet"){
+            //是否是玩家坦克子弹
+            let bulletScript = other.getComponent("Bullet") as Bullet;
+            if (bulletScript.tag.split("_")[0] == "enemy") {
+                this.injured();
             }
         }
     }
@@ -165,7 +212,7 @@ export class Tank extends cc.Component {
 
     tankSchedule() {
         if (this.isMove) {
-            let mapSize = this.parent.getContentSize();
+            let mapSize = this.node.parent.getContentSize();
             let tankSize = this.node.getContentSize();
             if (this.direction == 1) {
                 this.node.position = cc.v2(this.node.position.x, Math.min((this.node.position.y + this.speed), mapSize.height - tankSize.height / 2));
@@ -213,15 +260,9 @@ export class Tank extends cc.Component {
         this.node.destroy();
     }
 
-    public get parent(): cc.Node {
-        return this._parent;
-    }
-    public set parent(value: cc.Node) {
-        this._parent = value;
-    }
-
     onDestroy(){
         this.unschedule(this.tankSchedule);
+        this.unschedule(this.bulletSchedule);
         this.bulletPool.clear();
     }
 }

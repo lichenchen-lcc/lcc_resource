@@ -20,7 +20,7 @@ export class Tile extends cc.Component{
 
     public static init(caller: any, callback: Function) {
         //加载tile预制体
-        cc.loader.loadResDir(constants.PREFAB_UI_DIR + "tile_prefabs", cc.Prefab, (err, prefabs, urls) => {
+        cc.loader.loadResDir(constants.PREFAB_DIR + "tile_prefabs", cc.Prefab, (err, prefabs, urls) => {
             if (!err) {
                 for (let i = 0; i < urls.length; ++i) {
                     let urlArr = urls[i].split("/");

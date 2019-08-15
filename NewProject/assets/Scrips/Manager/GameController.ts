@@ -4,6 +4,23 @@ import { ListenerManager } from "./ListenerManager";
 import { LoadingUI } from "../UI/LoadingUI";
 import { MainUI } from "../UI/MainUI";
 import { MapManager } from "./MapManager";
+import { ResultUI } from "../UI/ResultUI";
+
+function classDecorator<T extends {new(...args:any[]):{}}>(constructor:T) {
+    return class extends constructor{
+        property = "new property"
+    }
+}
+
+function enumerable(value:boolean) {
+    return (target:any,propertyKey:string,descriptor:PropertyDescriptor)=> {
+        descriptor.enumerable = value;
+    };
+}
+
+function myLog(target:any) {
+    cc.log("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+}
 
 export class GameController {
     private static instance:GameController ;
@@ -16,7 +33,6 @@ export class GameController {
         }
         return this.instance;
     }
-
     /**
      * initGame
      */
@@ -29,12 +45,14 @@ export class GameController {
     /**
      * initListener
      */
+    
     public initListener() {
         let listenerManager = ListenerManager.getInstance();
 
         //注册当前ui监听--用路径  回调只返回类名
         listenerManager.register(LoadingUI, "UI/LoadingUI");
         listenerManager.register(MainUI,"UI/MainUI");
+        listenerManager.register(ResultUI,"UI/ResultUI");
     }
 
     /**
@@ -44,4 +62,5 @@ export class GameController {
         TankMapDataManager.getInstance().load("tankMap");
         MapManager.getInstance().load("map1");
     }
+
 }

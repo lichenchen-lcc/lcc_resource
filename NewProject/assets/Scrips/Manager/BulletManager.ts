@@ -15,7 +15,7 @@ export class BulletManager {
     }
 
     private async initBulletPrefab(){
-        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_UI_DIR + "Bullet");
+        this.bulletPrefab = await AsyncLoadPrefabManager.getInstance().loadRes(constants.PREFAB_DIR + "Bullet");
     }
 
     //对所有敌人的子弹进行统一管理

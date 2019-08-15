@@ -9,7 +9,7 @@
   "type": "Texture Packer",
   "subMetas": {
     "boom.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "24cd2c09-54ff-43b4-8ee1-9ee36b9953ad",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -31,7 +31,7 @@
       "subMetas": {}
     },
     "boom1.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "6498b259-e201-4b41-88bb-060babbbb8ba",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -53,7 +53,7 @@
       "subMetas": {}
     },
     "boom2.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "218b2a6c-a9cd-429c-b053-0499aa2f2398",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -75,7 +75,7 @@
       "subMetas": {}
     },
     "boom3.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "c4657f49-3316-4e5d-bbda-2736f4756052",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -97,7 +97,7 @@
       "subMetas": {}
     },
     "boom4.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "46710e80-72a5-4422-ae75-d0253fe4d96f",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -119,7 +119,7 @@
       "subMetas": {}
     },
     "boom5.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "3b517772-a9f6-4ed9-9cab-56df0b835a6d",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -141,7 +141,7 @@
       "subMetas": {}
     },
     "boom6.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "d7f49d5d-8f76-4435-b147-c3b1913f455a",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",
@@ -163,7 +163,7 @@
       "subMetas": {}
     },
     "boom7.png": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "1f707601-b733-4761-bca6-b11cc46255c8",
       "rawTextureUuid": "fd4d3a25-5eb6-4647-9eb1-2eb6e301069a",
       "trimType": "auto",

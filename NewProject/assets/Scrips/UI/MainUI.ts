@@ -18,11 +18,11 @@ export class MainUI extends BaseUI {
     protected className = "MainUI";
 
     @property(cc.Node)
-    private hinder: cc.Node = null;
-    @property(cc.Node)
     private mapLayer: cc.Node;
     @property(cc.Node)
     private menu: cc.Node = null;
+    @property(cc.ScrollView)
+    private tankBlood: cc.ScrollView = null;
 
     private tanks: Array<Tank> = [];
     private tiles: Array<Tile> = [];
@@ -86,19 +86,13 @@ export class MainUI extends BaseUI {
     }
 
     initTankCallback(callback, tank: Tank) {
-        tank.parent = this.mapLayer;
+        //初始化血量
+        tank.tankBloodChange(this.tankBlood);
         this.tanks.push(tank);
-        EnemyManager.getInstance().createrEnemy(5, this.mapLayer, this.mapLayer.getContentSize());
+        EnemyManager.getInstance().createrEnemy(1, this.mapLayer, this.mapLayer.getContentSize());
         // EnemyManager.getInstance().createrEnemyByType("JumpEnemy", this.mapLayer, this.mapLayer.getContentSize());
         this.isTouch = true;
     }
-
-    // start () {
-    //     let values = TankMapDataManager.getInstance().values
-    //     for (let value of values){
-    //         cc.log(value.get("name"));
-    //     }
-    // }
 
     update(dt) {
 

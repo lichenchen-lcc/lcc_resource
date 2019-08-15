@@ -28,6 +28,7 @@ export default class FirstCanvas extends cc.Component {
             // }
             // myLable.string = i + "";
             //--button
+            Array.prototype.slice.call
             var buy_btn: cc.Button = widget.getChildByName("buy_btn").getComponent(cc.Button);
             buy_btn.node.on(cc.Node.EventType.TOUCH_END, this.onBuyClick).bind(this);
             content.addChild(widget);

@@ -1,13 +1,14 @@
 {
-  "ver": "2.2.0",
+  "ver": "2.3.1",
   "uuid": "1c1f299c-10b9-470c-8fc4-50de9536c0bd",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "premultiplyAlpha": false,
+  "platformSettings": {},
   "subMetas": {
     "qingtai": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "389640ff-13d6-4863-86de-2e2c4ad5df01",
       "rawTextureUuid": "1c1f299c-10b9-470c-8fc4-50de9536c0bd",
       "trimType": "auto",

@@ -2,6 +2,7 @@ import { Dictionary } from "../Utils/Dictionary";
 import { Enemy } from "../Enemy/Enemy";
 import { constants } from "../constants";
 import { AsyncLoadPrefabManager } from "./AsyncLoadPrefabManager";
+import { ScoreManager } from "./ScoreManager";
 
 export class EnemyManager {
     private static instance: EnemyManager = null;
@@ -79,6 +80,8 @@ export class EnemyManager {
             let enemyScript = enemy.getComponent(url) as Enemy;
             enemyScript.tag = url;
             cc.log("create enemy:" + enemyScript.tag);
+            //添加记录
+            ScoreManager.getInstance().addLiveEnemy(enemyScript.tag);
         } else {
             cc.loader.loadRes(constants.ENEMY_PREFAB + url, cc.Prefab, (err, prefab) => {
                 if (!err) {
@@ -88,6 +91,8 @@ export class EnemyManager {
                     let enemyScript = enemy.getComponent(url) as Enemy;
                     enemyScript.tag = url;
                     cc.log("create enemy:" + enemyScript.tag);
+                    //添加记录
+                    ScoreManager.getInstance().addLiveEnemy(enemyScript.tag);
                 } else {
                     cc.log("load %s is error", url);
                 }
@@ -96,14 +101,9 @@ export class EnemyManager {
     }
 
     public enemyDestroyCallback(tag: string, node: cc.Node) {
-        cc.log("zibao2");
-        cc.log(node.name);
         let pool: cc.NodePool = this.poolDic.get(tag);
-        cc.log(this.poolDic.length);
-        if (pool == null){
-            cc.log("pool is null");
-        }
         pool.put(node);
+        ScoreManager.getInstance().addDeadEnemy(tag);
     }
 
     private getRandPos(): cc.Vec2 {

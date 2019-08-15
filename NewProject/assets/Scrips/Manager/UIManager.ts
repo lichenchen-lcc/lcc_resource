@@ -15,7 +15,7 @@ export class UIManager {
      */
     public static getInstance(): UIManager {
         if (this.instance == null) {
-            this.instance = new UIManager
+            this.instance = new UIManager();
         }
         return this.instance;
     }

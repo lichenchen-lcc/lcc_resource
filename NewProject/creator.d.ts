@@ -10086,7 +10086,7 @@ declare namespace cc {
 		});
 		
 		// load the sprite frame of (project/assets/resources/imgs/cocos.png) from resources folder
-		cc.loader.loadRes('imgs/cocos', cc.SpriteFrame,cc.SpriteFrame, function (err, spriteFrame) {
+		cc.loader.loadRes('imgs/cocos', cc.SpriteFrame, function (err, spriteFrame) {
 		    if (err) {
 		        cc.error(err.message || err);
 		        return;
