@@ -59,6 +59,12 @@ cc.Class({
 
     onLoad() {
         let winSize = cc.winSize;
+        // cc.PhysicsManager.prototype.start();
+        // cc.director.getPhysicsManager().start = true;
+        // this.world = new b2.World(new b2.Vec2(0, -10));
+        // this.world.SetAllowSleeping(true);
+        // this.world.SetContinuousPhysics(true);
+        // cc.director.getPhysicsManager()._world = this.world;
 
         cc.director.getPhysicsManager().enabled = true;
         this.world = cc.director.getPhysicsManager()._world;
@@ -73,6 +79,10 @@ cc.Class({
             cc.PhysicsManager.DrawBits.e_shapeBit |
             cc.PhysicsManager.DrawBits.e_particleBit;
 
+        // this.world.m_locked = false;
+        // cc.director.getPhysicsManager()._initCallback();
+        // cc.director.getPhysicsManager()._enabled = true;
+
 
         var psd = new b2.ParticleSystemDef();
         psd.radius = 0.030;//粒子的精细度
@@ -80,6 +90,8 @@ cc.Class({
         cc.director.getPhysicsManager()._particle = this.world.CreateParticleSystem(psd);
         this.particleSystem = cc.director.getPhysicsManager()._particle;
         this.particleSystem.SetGravityScale(this.gravityScale);
+
+
 
         //particle
         let shape = new b2.CircleShape();
@@ -93,7 +105,20 @@ cc.Class({
         let pos = this.nodePosToParticle(this.node.position);
         pd.position.Set(pos.x, pos.y);
         pd.color.Set(255, 0, 0, 255);
-        this.particleSystem.CreateParticleGroup(pd);        
+        this.particleSystem.CreateParticleGroup(pd);
+
+        shape = new b2.CircleShape();
+        shape.m_p.Set(-1, 3);
+        shape.m_radius = 0.5;
+        pd = new b2.ParticleGroupDef();
+        pd.flags = b2.ParticleFlag.b2_waterParticle;
+        pd.groupFlags = b2.ParticleGroupFlag.b2_solidParticleGroup;
+        // pd.groupFlags = b2.ParticleGroupFlag.b2_rigidParticleGroup;
+        pd.shape = shape;
+        pd.position.Set(winSize.width / 3/ this.PTM_RATIO, winSize.height / 2 / this.PTM_RATIO);
+        pd.color.Set(0, 255, 0, 255);
+        this.particleSystem.CreateParticleGroup(pd);
+        
         
         let groundBodyDef = new b2.BodyDef();
         groundBodyDef.position.Set(0, 0);
