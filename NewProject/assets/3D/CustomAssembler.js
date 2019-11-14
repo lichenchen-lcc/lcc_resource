@@ -1,5 +1,5 @@
 const renderEngine = cc.renderer.renderEngine;
-const gfx = renderEngine.gfx;
+const gfx = cc.gfx;
 
 // 引擎定义的顶点数据的 buffer 格式, 参考引擎中的 vertex-format.js
 // 传递位置及 UV

@@ -4,13 +4,16 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class Cat extends cc.Component {
     private isTan: boolean = false;
-    private tanNum:number = 10;
+    private tanNum: number = 10;
 
     // @property(cc.SpriteFrame)
     // pressStatus:cc.SpriteFrame;
     // button:cc.Button;
     // sprite:cc.Sprite;
     onLoad() {
+        
+        // let material = this.getComponent(cc.Sprite);
+        // material.node.getContentSize
         // this.sprite.sp
         // this.button.pressedSprite = this.pressStatus;
         // let frame:cc.SpriteFrame = new cc.SpriteFrame();
@@ -26,14 +29,14 @@ export default class Cat extends cc.Component {
 
     onCollisionEnter(other, self) {
         cc.log("cat is collision" + other.node.name);
-        
+
     }
 
     onBeginContact(contact, selfCollider, otherCollider) {
         // cc.log("cat is onBeginContact   " + otherCollider.node.name);
         let rigid = this.getComponent(cc.RigidBody);
 
-        rigid.applyForceToCenter(cc.v2(100,0),false);
+        rigid.applyForceToCenter(cc.v2(100, 0), false);
 
         if (!this.isTan) {
             let sprite = this.node.getChildByName("sprite");
@@ -44,14 +47,14 @@ export default class Cat extends cc.Component {
         }
 
         let worldManifold = contact.getWorldManifold();
-        let points:Array<cc.Vec2> = worldManifold.points;
-        let normal:cc.Vec2 = worldManifold.normal;
+        let points: Array<cc.Vec2> = worldManifold.points;
+        let normal: cc.Vec2 = worldManifold.normal;
 
         // cc.log("rotation : %d",this.node.rotation);
         // cc.log("rotationx : %d", this.node.rotationX);
         // cc.log("rotationy : %d", this.node.rotationY);
-        cc.log("length:%d",points.length);
-        cc.log("x:%f,y:%f",normal.x,normal.y);
+        cc.log("length:%d", points.length);
+        cc.log("x:%f,y:%f", normal.x, normal.y);
         // var o = points[0].x - points[1].x
         // var a = points[0].y - points[1].y
         let o = normal.x;
@@ -63,14 +66,14 @@ export default class Cat extends cc.Component {
             else
                 at = 180 - Math.abs(at);
         }
-        cc.log("angle:%f",at);
+        cc.log("angle:%f", at);
     }
 
     onEndContact(contact, selfCollider, otherCollider) {
         // cc.log("cat is onEndContact   " + otherCollider.node.name);
     }
 
-    test(a = 0,b:number){
+    test(a = 0, b: number) {
 
     }
     // onPreSolve(contact, selfCollider, otherCollider) {
@@ -80,5 +83,5 @@ export default class Cat extends cc.Component {
     // onPostSolve(contact, selfCollider, otherCollider) {
     //     cc.log("cat is onPostSolve   " + otherCollider.node.name);
     // }
-    
+
 }
