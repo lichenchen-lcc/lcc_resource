@@ -57,6 +57,7 @@ export default class Doodle extends cc.Component {
         // cc.log("this.rotation:" + this.node.rotation);
         // this.updateNodes();
         this.softCicle();
+        // this.node.position.x += dt;
         this.render();
     }
 

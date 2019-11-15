@@ -83,5 +83,8 @@ export default class Cat extends cc.Component {
     // onPostSolve(contact, selfCollider, otherCollider) {
     //     cc.log("cat is onPostSolve   " + otherCollider.node.name);
     // }
-
+    update(dt){
+        // this.node.position.x += dt;
+        // cc.log(dt);
+    }
 }
