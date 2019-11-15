@@ -1403,7 +1403,7 @@
     },
     "_enabled": true,
     "tag": 0,
-    "_density": 0,
+    "_density": 20.30000000000002,
     "_sensor": false,
     "_friction": 0.2,
     "_restitution": 0.3,
@@ -3561,6 +3561,7 @@
     "radius": 0.7,
     "gravityScale": 1,
     "isBox": true,
+    "density": 1,
     "_id": "11VYalKtZI0q6L8io6IkBg"
   },
   {
@@ -3742,8 +3743,8 @@
       "__type__": "TypedArray",
       "ctor": "Float32Array",
       "array": [
-        106.51399993896484,
-        30.003999710083008,
+        -367.5480041503906,
+        258.03399658203125,
         0,
         0,
         0,
@@ -3779,6 +3780,7 @@
     "radius": 0.7,
     "gravityScale": 1,
     "isBox": true,
+    "density": 100,
     "_id": "8ag7b0DkJLJrqdf4pnY9jD"
   },
   {
@@ -7361,8 +7363,8 @@
       "__type__": "TypedArray",
       "ctor": "Float32Array",
       "array": [
-        -189.02499389648438,
-        -82.51100158691406,
+        -196.5260009765625,
+        -94.51200103759766,
         0,
         0,
         0,

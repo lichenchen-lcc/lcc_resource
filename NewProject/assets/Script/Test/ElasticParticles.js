@@ -53,53 +53,60 @@ cc.Class({
             max: 5,
             step: 0.1,
         },
+        density: {
+            default: 1,
+            tooltip: "密度",
+            type: cc.Float,
+            step: 0.1,
+            min: 0
+        },
+        // damping :{
+        //     default: 0,
+        //     type: cc.Float,
+        //     tooltip:"设置阻尼"
+        // },
         isBox: {
-            default: true,
+            default: false,
             tooltip: "创建屏幕包围盒"
-        }
+        },
     },
 
     ctor: function () {
         this.PTM_RATIO = 32;
-        this.world = null;
-        this.particleSystem = null;
-        this.material = null;
+        this._world = null;
+        this._particleSystem = null;
 
-        this.drawNodes = new Array();
-        this.particleCenterPos = new cc.Vec2(0,0);
-        this.particleIndex = 0;
+        this._drawNodes = new Array();
+        this._particleCenterPos = new cc.Vec2(0,0);
+        this._particleIndex = 0;
     },
 
 
     onLoad() {
         this.graphics = this.getComponent(cc.Graphics);
-        this.particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
+        this._particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
         this.createParticles();
         this.initParticleNodes();
     },
 
-    initShaderTemp: function () {
-
-    },
-
     initParticleNodes: function () {
         let radius = this.radius * this.PTM_RATIO;
-        this.particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
-        cc.log("this.particleCenterPos x = %f,y = %f ,radius = %f", this.particleCenterPos.x, this.particleCenterPos.y, radius);
-        let vertsCount = this.particleSystem.GetParticleCount();//b2ParticleSystem函数，获取粒子数量
-        let posVerts = this.particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
+        this._particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
+        cc.log("this._particleCenterPos x = %f,y = %f ,radius = %f", this._particleCenterPos.x, this._particleCenterPos.y, radius);
+        let vertsCount = this._particleSystem.GetParticleCount();//b2ParticleSystem函数，获取粒子数量
+        let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         cc.log("vertsCount : %d", vertsCount);
         let centerDis = radius;
         for (let i = 0; i < vertsCount; i++) {
             let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
-            let dis = this.particleCenterPos.sub(pos).mag();
+            let dis = this._particleCenterPos.sub(pos).mag();
             if (dis < centerDis){
-                this.particleIndex = i;
+                this._particleIndex = i;
                 centerDis = dis;
             }
             let difference = Math.abs(dis - radius);
             if (difference <= 1) {
-                let tempPos = new cc.Vec2(pos.x - this.particleCenterPos.x, pos.y - this.particleCenterPos.y);
+                let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
                 let angle = tempPos.y / (radius) * 180 / Math.PI;
                 if (tempPos.x >= 0 && tempPos.y > 0) {
                     angle = angle;
@@ -111,18 +118,18 @@ cc.Class({
                     angle = 360 + angle;
                 }
                 // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", pos.x, pos.y, dis, difference, angle);
-                this.drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
+                this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
             }
         }
-        this.drawNodes.sort(function (a, b) {
+        this._drawNodes.sort(function (a, b) {
             return a.angle - b.angle;
         });
-        cc.log("this.particleIndex = %d x=%f,y=%f, ", this.particleIndex, posVerts[this.particleIndex].x * this.PTM_RATIO, posVerts[this.particleIndex].y * this.PTM_RATIO);
+        cc.log("this._particleIndex = %d x=%f,y=%f, ", this._particleIndex, posVerts[this._particleIndex].x * this.PTM_RATIO, posVerts[this._particleIndex].y * this.PTM_RATIO);
         this.render();
     },
 
     render: function () {
-        if (this.drawNodes.length <= 0) {
+        if (this._drawNodes.length <= 0) {
             alert("can't found nodes");
             return;
         }
@@ -131,7 +138,7 @@ cc.Class({
             return;
         }
         let graphics = this.graphics;
-        let nodes = this.drawNodes;
+        let nodes = this._drawNodes;
 
         graphics.clear();
 
@@ -172,16 +179,15 @@ cc.Class({
         let winSize = cc.winSize;
         // cc.PhysicsManager.prototype.start();
         // cc.director.getPhysicsManager().start = true;
-        // this.world = new b2.World(new b2.Vec2(0, -10));
-        // this.world.SetAllowSleeping(true);
-        // this.world.SetContinuousPhysics(true);
-        // cc.director.getPhysicsManager()._world = this.world;
+        // this._world = new b2.World(new b2.Vec2(0, -10));
+        // this._world.SetAllowSleeping(true);
+        // this._world.SetContinuousPhysics(true);
+        // cc.director.getPhysicsManager()._world = this._world;
 
         cc.director.getPhysicsManager().enabled = true;
-        this.world = cc.director.getPhysicsManager()._world;
-        let ass = this.world._proto_;
-        this.world.SetAllowSleeping(true);
-        this.world.SetContinuousPhysics(true);
+        this._world = cc.director.getPhysicsManager()._world;
+        this._world.SetAllowSleeping(true);
+        this._world.SetContinuousPhysics(true);
         // cc.director.getPhysicsManager().debugDrawFlags =
         //     cc.PhysicsManager.DrawBits.e_aabbBit |
         //     cc.PhysicsManager.DrawBits.e_pairBit |
@@ -190,7 +196,7 @@ cc.Class({
         //     cc.PhysicsManager.DrawBits.e_shapeBit |
         //     cc.PhysicsManager.DrawBits.e_particleBit;
 
-        // this.world.m_locked = false;
+        // this._world.m_locked = false;
         // cc.director.getPhysicsManager()._initCallback();
         // cc.director.getPhysicsManager()._enabled = true;
 
@@ -198,9 +204,11 @@ cc.Class({
         var psd = new b2.ParticleSystemDef();
         psd.radius = 0.04;//粒子的精细度
         psd.elasticStrength = this.elastic;//恢复弹性粒子群的形状较大值增加弹性粒子速度
-        cc.director.getPhysicsManager()._particle = this.world.CreateParticleSystem(psd);
-        this.particleSystem = cc.director.getPhysicsManager()._particle;
-        this.particleSystem.SetGravityScale(this.gravityScale);
+        cc.director.getPhysicsManager()._particle = this._world.CreateParticleSystem(psd);
+        this._particleSystem = cc.director.getPhysicsManager()._particle;
+        this._particleSystem.SetGravityScale(this.gravityScale);
+        this._particleSystem.SetDensity(this.density);
+        // this._particleSystem.SetDamping(this.damping);
 
         //particle
         let shape = new b2.CircleShape();
@@ -214,11 +222,11 @@ cc.Class({
         let pos = this.nodePosToParticle(this.node.position);
         pd.position.Set(pos.x, pos.y);
         pd.color.Set(255, 0, 0, 255);
-        this.particleSystem.CreateParticleGroup(pd);
+        this._particleSystem.CreateParticleGroup(pd);
 
         let groundBodyDef = new b2.BodyDef();
         groundBodyDef.position.Set(0, 0);
-        let groundBody = this.world.CreateBody(groundBodyDef);
+        let groundBody = this._world.CreateBody(groundBodyDef);
 
         if (this.isBox) {
             //boldy
@@ -247,20 +255,20 @@ cc.Class({
     },
 
     updateParticleNodes: function(){
-        let posVerts = this.particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
+        let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         //更新中心点坐标
-        this.particleCenterPos.x = posVerts[this.particleIndex].x * this.PTM_RATIO;
-        this.particleCenterPos.y = posVerts[this.particleIndex].y * this.PTM_RATIO;
+        this._particleCenterPos.x = posVerts[this._particleIndex].x * this.PTM_RATIO;
+        this._particleCenterPos.y = posVerts[this._particleIndex].y * this.PTM_RATIO;
         //更新this.node.position
-        this.node.position = new cc.Vec2(this.particleCenterPos.x - cc.winSize.width / 2, this.particleCenterPos.y - cc.winSize.height / 2); 
+        this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2); 
 
         // cc.log("this.node.position  x = %f,y=%f", this.node.position.x, this.node.position.y);
-        for (let i = 0; i < this.drawNodes.length; i++) {
-            let node = this.drawNodes[i];
+        for (let i = 0; i < this._drawNodes.length; i++) {
+            let node = this._drawNodes[i];
             if (posVerts[node.index]) {
                 // cc.log("nodes x=%f,y=%f, angel = %f", posVerts[node.index].x * this.PTM_RATIO - cc.winSize.width / 2, posVerts[node.index].y * this.PTM_RATIO - cc.winSize.height / 2, node.angle);
             }
-            let pos = new cc.Vec2(posVerts[node.index].x * this.PTM_RATIO - this.particleCenterPos.x, posVerts[node.index].y * this.PTM_RATIO - this.particleCenterPos.y);
+            let pos = new cc.Vec2(posVerts[node.index].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[node.index].y * this.PTM_RATIO - this._particleCenterPos.y);
             node.x = pos.x;
             node.y = pos.y;
 
@@ -277,7 +285,7 @@ cc.Class({
             // node.angle = angle;
             // cc.log("i = %d  index = %d  x=%f,y=%f, ", i, node.index, pos.x, pos.y);
         }
-        // this.drawNodes.sort(function (a, b) {
+        // this._drawNodes.sort(function (a, b) {
         //     return a.angle - b.angle;
         // });
         
@@ -285,7 +293,7 @@ cc.Class({
     },
 
     update(dt) {
-        if (this.drawNodes.length > 0 ){
+        if (this._drawNodes.length > 0 ){
             this.updateParticleNodes();
         }
     },
