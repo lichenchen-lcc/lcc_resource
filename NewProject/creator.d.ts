@@ -1636,7 +1636,7 @@ declare namespace cc {
 	export var dynamicAtlasManager: DynamicAtlasManager;	
 
 	/**
-	 * 
+	 * @class 软体碰撞系统
 	 */
 	export class ElasticParticles extends cc.Component {
 		/**
@@ -1649,6 +1649,19 @@ declare namespace cc {
 		 * @param force 受力 
 		 */
 		applyForce(force:cc.Vec2): void;
+
+		/**
+		 * @function 添加软体碰撞首次回调
+		 * @param listener 回调方法
+		 * @param caller 回调对象(this)
+		 * @callback otherCollider(对方碰撞体) 和 normalVector(法向量)
+		 * @example
+		 * elastic.registerBeginContact((collider,normal)=>{
+            let vector = normal;
+            let nodeName = collider.node.name;
+        },this);
+		 */
+		registerBeginContact(listener:Function, caller:any):void;
 	}
 
 	/** !#en

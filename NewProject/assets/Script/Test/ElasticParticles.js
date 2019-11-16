@@ -82,6 +82,10 @@ var ElasticParticles = cc.Class({
 
         this._drawNodes = new Array();
         this._particleCenterPos = new cc.Vec2(0, 0);
+
+        this._onBeginContact = null;
+        this._isBeginContact = false;
+        this._contactCaller = null;
     },
 
 
@@ -275,16 +279,22 @@ var ElasticParticles = cc.Class({
             this.updateParticleNodes();
         }
 
-        let angle = this._particleGroup.GetLinearVelocity()  ;
-        cc.log("angle %f,%f", angle.x, angle.y);
-        // cc.log("this.angle" + this.node.angle);
-        // let contact = this._particleSystem.GetStrictContactCheck() ;
-        // if (contact){
-        //     // let normal = contact[0].GetNormal();
-        //     cc.log("+++++++ ");
-        // }else {
-        //     cc.log("---------");
-        // }
+        //b2ParticleBodyContact
+        let count = this._particleSystem.GetBodyContactCount();
+
+        if (this._onBeginContact && count > 0 && !this._isBeginContact){
+            this._isBeginContact = true;
+            let contacts = this._particleSystem.GetBodyContacts();
+            let contact = contacts[0];
+            let normalVector = new cc.Vec2(contact.normal.x * this.PTM_RATIO,contact.normal.y * this.PTM_RATIO);
+            let collider = contact.fixture.collider;
+
+            this._onBeginContact.call(this._contactCaller, collider, normalVector);
+        }
+        if (count <= 0 && this._isBeginContact){
+            this._isBeginContact = false;
+        }
+       
     },
 
     onDestroy(){
@@ -292,6 +302,8 @@ var ElasticParticles = cc.Class({
             this._particleGroup.DestroyParticles();
             this._particleSystem = null;
             cc.director.getPhysicsManager()._particle = null;
+            this._onBeginContact = null;
+            this._contactCaller = null;
         }
     }
 
@@ -324,6 +336,13 @@ ElasticParticles.prototype.applyForce = function (force) {
         let vertsCount = this._particleSystem.GetParticleCount();
         this._particleSystem.ApplyForce(0, vertsCount - 1, new b2.Vec2(force.x / this.PTM_RATIO, force.y / this.PTM_RATIO));
     }
-}
+};
+
+ElasticParticles.prototype.registerBeginContact = function(listener,caller){
+    if (listener && caller){
+        this._onBeginContact = listener;
+        this._contactCaller = caller;
+    }
+};
 
 module.exports = ElasticParticles;
