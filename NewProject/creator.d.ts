@@ -1,4 +1,3 @@
-
 /** !#en
 The main namespace of Cocos2d-JS, all engine core classes, functions, properties and constants are defined in this namespace.
 !#zh
@@ -1635,6 +1634,23 @@ declare namespace cc {
 	*/
 	export function v4(x?: number|any, y?: number, z?: number): Vec4;	
 	export var dynamicAtlasManager: DynamicAtlasManager;	
+
+	/**
+	 * 
+	 */
+	export class ElasticParticles extends cc.Component {
+		/**
+		 * 改变粒子的速度，这个与density(密度)有关，密度越小效果越明显
+		 */
+		linearVelocity: cc.Vec2;
+
+		/**
+		 * @function 对粒子添加受力，这个与density(密度)有关，密度越小效果越明显
+		 * @param force 受力 
+		 */
+		applyForce(force:cc.Vec2): void;
+	}
+
 	/** !#en
 	 cc.NodePool is the cache pool designed for node type.<br/>
 	 It can helps you to improve your game performance for objects which need frequent release and recreate operations<br/>

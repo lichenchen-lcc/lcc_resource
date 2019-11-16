@@ -69,6 +69,7 @@ export default class Cat extends cc.Component {
         cc.log("angle:%f", at);
     }
 
+
     onEndContact(contact, selfCollider, otherCollider) {
         // cc.log("cat is onEndContact   " + otherCollider.node.name);
     }
