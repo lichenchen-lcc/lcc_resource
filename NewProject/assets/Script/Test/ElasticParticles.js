@@ -60,6 +60,11 @@ var ElasticParticles = cc.Class({
             step: 0.1,
             min: 0
         },
+        // color:{
+        //     default: new cc.Color(255, 235, 4, 255),
+        //     // type:cc.Color,
+        //     tooltip:"软体颜色"
+        // },
         // damping :{
         //     default: 0,
         //     type: cc.Float,
@@ -86,6 +91,13 @@ var ElasticParticles = cc.Class({
         this._onBeginContact = null;
         this._isBeginContact = false;
         this._contactCaller = null;
+        this._onEndedContact = null;
+
+        this._angleIndex = 0;
+        this._initialAngle = 0;
+        this._angle = 0;
+
+        this._fillColor = cc.Color.YELLOW;
     },
 
 
@@ -94,10 +106,24 @@ var ElasticParticles = cc.Class({
         this._particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
         this.createParticles();
         this.initParticleNodes();
-
     },
 
     start() {
+    },
+
+    getNodeAngle: function (tempPos){
+        let radius = this.radius * this.PTM_RATIO;
+        let angle = tempPos.y / (radius) * 180 / Math.PI;
+        if (tempPos.x >= 0 && tempPos.y > 0) {
+            angle = angle;
+        } else if (tempPos.x < 0 && tempPos.y >= 0) {
+            angle = 180 - angle;
+        } else if (tempPos.x <= 0 && tempPos.y < 0) {
+            angle = Math.abs(angle) + 180;
+        } else if (tempPos.x > 0 && tempPos.y <= 0) {
+            angle = 360 + angle;
+        }
+        return angle;
     },
 
     initParticleNodes: function () {
@@ -114,16 +140,7 @@ var ElasticParticles = cc.Class({
             let difference = Math.abs(dis - radius);
             if (difference <= 1) {
                 let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
-                let angle = tempPos.y / (radius) * 180 / Math.PI;
-                if (tempPos.x >= 0 && tempPos.y > 0) {
-                    angle = angle;
-                } else if (tempPos.x < 0 && tempPos.y >= 0) {
-                    angle = 180 - angle;
-                } else if (tempPos.x <= 0 && tempPos.y < 0) {
-                    angle = Math.abs(angle) + 180;
-                } else if (tempPos.x > 0 && tempPos.y <= 0) {
-                    angle = 360 + angle;
-                }
+                let angle = this.getNodeAngle(tempPos);
                 // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", pos.x, pos.y, dis, difference, angle);
                 this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
             }
@@ -131,6 +148,9 @@ var ElasticParticles = cc.Class({
         this._drawNodes.sort(function (a, b) {
             return a.angle - b.angle;
         });
+        //角度
+        this._angleIndex = this._drawNodes[0].index;
+        this._initialAngle = this._drawNodes[0].angle;
         this.render();
     },
 
@@ -161,8 +181,9 @@ var ElasticParticles = cc.Class({
         graphics.moveTo(xc, yc);
         graphics.lineCap = cc.Graphics.LineCap.ROUND;
         graphics.lineJoin = cc.Graphics.LineJoin.ROUND;
-        graphics.strokeColor = cc.Color.RED;//线段颜色
-        graphics.fillColor = cc.Color.YELLOW;
+        graphics.strokeColor = this._fillColor;//线段颜色
+        graphics.fillColor = this._fillColor;
+        // cc.log("this._fillColor  %d,%d,%d,%d", this._fillColor.r, this._fillColor.g, this._fillColor.b, this._fillColor.a);
         graphics.lineWidth = 5
 
         // Draw through N points
@@ -257,6 +278,13 @@ var ElasticParticles = cc.Class({
         let center = this._particleGroup.GetCenter();
         this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
 
+        //同步角度
+        let angle = this.getNodeAngle(cc.v2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y));
+        angle -= this._initialAngle;
+        this._angle = angle;
+        // cc.log("this._angle %f", this._angle);
+        // this.node.angle = angle;
+
         //更新this.node.position
         this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2);
 
@@ -291,10 +319,12 @@ var ElasticParticles = cc.Class({
 
             this._onBeginContact.call(this._contactCaller, collider, normalVector);
         }
-        if (count <= 0 && this._isBeginContact){
+        if (count <= 0 && this._isBeginContact ){
             this._isBeginContact = false;
+
+            this._onEndedContact.call(this._contactCaller);
         }
-       
+
     },
 
     onDestroy(){
@@ -309,6 +339,7 @@ var ElasticParticles = cc.Class({
 
     // update (dt) {},
 });
+
 /**
  * @function 改变粒子的速度，这个与density(密度)有关，密度越小效果越明显
  * @param velocity 速度 type: cc.Vec2
@@ -326,7 +357,11 @@ cc.js.getset(ElasticParticles.prototype, 'linearVelocity',
     }
 );
 
-
+ElasticParticles.prototype.setFillColor = function(color){
+    if (color){
+        this._fillColor = color;
+    }
+};
 /**
  * @function 对粒子添加受力，这个与density(密度)有关，密度越小效果越明显
  * @param force 受力 type: cc.Vec2
@@ -341,6 +376,13 @@ ElasticParticles.prototype.applyForce = function (force) {
 ElasticParticles.prototype.registerBeginContact = function(listener,caller){
     if (listener && caller){
         this._onBeginContact = listener;
+        this._contactCaller = caller;
+    }
+};
+
+ElasticParticles.prototype.registerEndedContact = function (listener, caller) {
+    if (listener && caller) {
+        this._onEndedContact = listener;
         this._contactCaller = caller;
     }
 };

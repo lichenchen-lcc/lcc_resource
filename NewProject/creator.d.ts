@@ -1639,6 +1639,7 @@ declare namespace cc {
 	 * @class 软体碰撞系统
 	 */
 	export class ElasticParticles extends cc.Component {
+
 		/**
 		 * 改变粒子的速度，这个与density(密度)有关，密度越小效果越明显
 		 */
@@ -1662,6 +1663,23 @@ declare namespace cc {
         },this);
 		 */
 		registerBeginContact(listener:Function, caller:any):void;
+		/**
+		 * @function 添加软体碰撞结束回调
+		 * @param listener 回调方法
+		 * @param caller 回调对象(this)
+		 * @callback 无参
+		 * @example
+		 * elastic.registerEndedContact(()=>{
+            let a = 0;
+        },this);
+			*/
+		registerEndedContact(listener:Function, caller:any):void;
+
+		/**
+		 * @function 修改填充颜色
+		 * @param color 
+		 */
+		setFillColor(color:Color):void;
 	}
 
 	/** !#en

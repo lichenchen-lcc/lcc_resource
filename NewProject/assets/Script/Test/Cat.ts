@@ -11,7 +11,7 @@ export default class Cat extends cc.Component {
     // button:cc.Button;
     // sprite:cc.Sprite;
     onLoad() {
-        
+        cc.director.getPhysicsManager().enabled = true;
         // let material = this.getComponent(cc.Sprite);
         // material.node.getContentSize
         // this.sprite.sp
@@ -87,5 +87,8 @@ export default class Cat extends cc.Component {
     update(dt){
         // this.node.position.x += dt;
         // cc.log(dt);
+        // cc.log("this rotation %f",this.node.angle );
+        cc.log("this rotation %f", this.node.rotation);
+        
     }
 }
