@@ -5,6 +5,8 @@ const {ccclass, property} = cc._decorator;
 export default class ParticleTest extends cc.Component {
     @property(cc.Button)
     button:cc.Button;
+    @property(cc.Node)
+    jijiao:cc.Node;
 
     elastic:cc.ElasticParticles;
     time:number = 0;
@@ -36,6 +38,7 @@ export default class ParticleTest extends cc.Component {
         this.time += 1;
         let color = new cc.Color(Math.min(255, this.time), 100, 0, 255) 
         this.elastic.setFillColor(color);
+        this.jijiao.angle = this.elastic.getAngle();
     }
 
     onDestroy(){

@@ -94,7 +94,7 @@ var ElasticParticles = cc.Class({
         this._onEndedContact = null;
 
         this._angleIndex = 0;
-        this._initialAngle = 0;
+        this._initialAnglePos = new cc.Vec2(0,0);
         this._angle = 0;
 
         this._fillColor = cc.Color.YELLOW;
@@ -150,7 +150,7 @@ var ElasticParticles = cc.Class({
         });
         //角度
         this._angleIndex = this._drawNodes[0].index;
-        this._initialAngle = this._drawNodes[0].angle;
+        this._initialAnglePos = new cc.Vec2(this._drawNodes[0].x, this._drawNodes[0].y);
         this.render();
     },
 
@@ -278,12 +278,6 @@ var ElasticParticles = cc.Class({
         let center = this._particleGroup.GetCenter();
         this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
 
-        //同步角度
-        let angle = this.getNodeAngle(cc.v2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y));
-        angle -= this._initialAngle;
-        this._angle = angle;
-        // cc.log("this._angle %f", this._angle);
-        // this.node.angle = angle;
 
         //更新this.node.position
         this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2);
@@ -298,6 +292,14 @@ var ElasticParticles = cc.Class({
             node.x = pos.x;
             node.y = pos.y;
         }
+
+        //同步角度
+        let tempPos = new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
+        let angle1 = this._initialAnglePos.angle(tempPos)*180/Math.PI;
+        let angle2 = this._initialAnglePos.signAngle(tempPos) * 180 / Math.PI;
+        cc.log("angle1 angle1 %f,%f", angle1, angle2);
+         
+        this._angle = angle2 || 0;
 
         this.render();
     },
@@ -357,6 +359,9 @@ cc.js.getset(ElasticParticles.prototype, 'linearVelocity',
     }
 );
 
+ElasticParticles.prototype.getAngle = function() {
+    return this._angle;
+}
 ElasticParticles.prototype.setFillColor = function(color){
     if (color){
         this._fillColor = color;
