@@ -25,6 +25,15 @@ var DrawNode = cc.Class({
     },
 });
 
+var Contact = cc.Class({
+    ctor: function (collider, normal) {
+        this.collider = collider;
+        this.normal = normal; 
+        this.reference = 0;
+        this.key = collider.node.name;
+    }
+});
+
 var ElasticParticles = cc.Class({
     extends: cc.Component,
 
@@ -89,15 +98,16 @@ var ElasticParticles = cc.Class({
         this._particleCenterPos = new cc.Vec2(0, 0);
 
         this._onBeginContact = null;
-        this._isBeginContact = false;
-        this._contactCaller = null;
         this._onEndedContact = null;
+        this._contactCaller = null;
 
         this._angleIndex = 0;
-        this._initialAnglePos = new cc.Vec2(0,0);
+        this._initialAnglePos = new cc.Vec2(0, 0);
         this._angle = 0;
 
         this._fillColor = cc.Color.YELLOW;
+
+        this._contactManager = new Array();
     },
 
 
@@ -111,7 +121,7 @@ var ElasticParticles = cc.Class({
     start() {
     },
 
-    getNodeAngle: function (tempPos){
+    getNodeAngle: function (tempPos) {
         let radius = this.radius * this.PTM_RATIO;
         let angle = tempPos.y / (radius) * 180 / Math.PI;
         if (tempPos.x >= 0 && tempPos.y > 0) {
@@ -295,13 +305,22 @@ var ElasticParticles = cc.Class({
 
         //同步角度
         let tempPos = new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
-        let angle1 = this._initialAnglePos.angle(tempPos)*180/Math.PI;
+        let angle1 = this._initialAnglePos.angle(tempPos) * 180 / Math.PI;
         let angle2 = this._initialAnglePos.signAngle(tempPos) * 180 / Math.PI;
-        cc.log("angle1 angle1 %f,%f", angle1, angle2);
-         
+        // cc.log("angle1 angle1 %f,%f", angle1, angle2);
+
         this._angle = angle2 || 0;
 
         this.render();
+    },
+
+    findInContactMng:function(key){
+        for (let i = 0;i<this._contactManager.length;i++){
+            if (this._contactManager[i] && (key === this._contactManager[i].key)){
+                return this._contactManager[i];
+            }
+        }
+        return false;
     },
 
     update(dt) {
@@ -311,31 +330,76 @@ var ElasticParticles = cc.Class({
 
         //b2ParticleBodyContact
         let count = this._particleSystem.GetBodyContactCount();
+        // cc.log("count  %d", count);
 
-        if (this._onBeginContact && count > 0 && !this._isBeginContact){
-            this._isBeginContact = true;
+        if (count > 0) {
             let contacts = this._particleSystem.GetBodyContacts();
-            let contact = contacts[0];
-            let normalVector = new cc.Vec2(contact.normal.x * this.PTM_RATIO,contact.normal.y * this.PTM_RATIO);
-            let collider = contact.fixture.collider;
 
-            this._onBeginContact.call(this._contactCaller, collider, normalVector);
-        }
-        if (count <= 0 && this._isBeginContact ){
-            this._isBeginContact = false;
+            for (let i = 0; i < count; i++) {
+                let contact = contacts[i];
+                // console.log("pengzhuang" + contact.fixture.collider.node.name);
+                if (contact.fixture.collider){
+                    // let name = contact.fixture.collider.node.name;
+                    // if (name.indexOf("bee") >= 0){
+                    //     console.log("8888" + name);
+                    // }
+                    let contactTemp = this.findInContactMng(contact.fixture.collider.node.name);
+                    if (!contactTemp){
+                        let normalVector = new cc.Vec2(contact.normal.x * this.PTM_RATIO, contact.normal.y * this.PTM_RATIO);
+                        let collider = contact.fixture.collider;
+                        if (this._onBeginContact ){
+                            this._onBeginContact.call(this._contactCaller, collider, normalVector);
+                        }
+                        let contactTemp = new Contact(collider, normalVector);
+                        contactTemp.reference = 1;
+                        this._contactManager.push(contactTemp);
+                    }else{
+                        contactTemp.reference = 1;
+                    }
+                }
+            }
+            for (let key in this._contactManager) {
+                if (this._contactManager[key]) {
+                    if (this._contactManager[key].reference == 0){
+                        if (this._onEndedContact){
+                            this._onEndedContact.call(this._contactCaller, this._contactManager[key].collider, this._contactManager[key].normal);
+                        }
+                        this._contactManager.splice(key,1);
+                    }
+                }
+            }
 
-            this._onEndedContact.call(this._contactCaller);
+        }else{
+            // cc.log("null   null ")
+            for (let key in this._contactManager) {
+                if (this._contactManager[key]) {
+                    if (this._onEndedContact){
+                        this._onEndedContact.call(this._contactCaller, this._contactManager[key].collider, this._contactManager[key].normal);
+                    }
+                    this._contactManager.splice(key, 1);
+                }
+            }
         }
+
+        //清空引用计数
+        for (let key in this._contactManager) {
+            if (this._contactManager[key]) {
+                this._contactManager[key].reference = 0;
+            }
+        }
+        // let a = 0;
 
     },
 
-    onDestroy(){
-        if (this._particleGroup){
+    onDestroy() {
+        if (this._particleGroup) {
             this._particleGroup.DestroyParticles();
             this._particleSystem = null;
             cc.director.getPhysicsManager()._particle = null;
             this._onBeginContact = null;
+            this._onEndedContact = null;
             this._contactCaller = null;
+            this._contactManager = null;
         }
     }
 
@@ -359,11 +423,11 @@ cc.js.getset(ElasticParticles.prototype, 'linearVelocity',
     }
 );
 
-ElasticParticles.prototype.getAngle = function() {
+ElasticParticles.prototype.getAngle = function () {
     return this._angle;
 }
-ElasticParticles.prototype.setFillColor = function(color){
-    if (color){
+ElasticParticles.prototype.setFillColor = function (color) {
+    if (color) {
         this._fillColor = color;
     }
 };
@@ -378,8 +442,8 @@ ElasticParticles.prototype.applyForce = function (force) {
     }
 };
 
-ElasticParticles.prototype.registerBeginContact = function(listener,caller){
-    if (listener && caller){
+ElasticParticles.prototype.registerBeginContact = function (listener, caller) {
+    if (listener && caller) {
         this._onBeginContact = listener;
         this._contactCaller = caller;
     }
