@@ -35,9 +35,9 @@ export default class ParticleTest extends cc.Component {
     }
 
     update (dt) {
-        this.time += 1;
-        let color = new cc.Color(Math.min(255, this.time), 100, 0, 255) 
-        this.elastic.setFillColor(color);
+        // this.time += 1;
+        // let color = new cc.Color(Math.min(255, this.time), 100, 0, 255) 
+        // this.elastic.setFillColor(color);
         this.jijiao.angle = this.elastic.getAngle();
     }
 

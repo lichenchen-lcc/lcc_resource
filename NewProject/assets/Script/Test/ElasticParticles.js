@@ -74,11 +74,14 @@ var ElasticParticles = cc.Class({
         //     // type:cc.Color,
         //     tooltip:"软体颜色"
         // },
-        // damping :{
-        //     default: 0,
-        //     type: cc.Float,
-        //     tooltip:"设置阻尼"
-        // },
+        damping :{
+            default: 0,
+            type: cc.Float,
+            tooltip:"设置阻尼",
+            min: 0,
+            max: 2,
+            step: 0.1,
+        },
         isDebug: {
             default: false,
         },
@@ -236,7 +239,7 @@ var ElasticParticles = cc.Class({
         this._particleSystem = cc.director.getPhysicsManager()._particle;
         this._particleSystem.SetGravityScale(this.gravityScale);
         this._particleSystem.SetDensity(this.density);
-        // this._particleSystem.SetDamping(this.damping);
+        this._particleSystem.SetDamping(this.damping);
 
         //particle
         let shape = new b2.CircleShape();

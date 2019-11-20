@@ -1666,7 +1666,7 @@ declare namespace cc {
 		 * @function 添加软体碰撞结束回调
 		 * @param listener 回调方法
 		 * @param caller 回调对象(this)
-		 * @callback 无参
+		 * @callback otherCollider(对方碰撞体) 和 normalVector(法向量)
 		 * @example
 		 * elastic.registerEndedContact(()=>{
             let a = 0;
@@ -1680,6 +1680,9 @@ declare namespace cc {
 		 */
 		setFillColor(color:Color):void;
 
+		/**
+		 * @function 得到当前的旋转角度
+		 */
 		getAngle():number;
 	}
 
