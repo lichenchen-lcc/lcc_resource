@@ -25,7 +25,9 @@ export default class ParticleTest extends cc.Component {
         }, this);
 
         this.button.node.on(cc.Node.EventType.TOUCH_START, () => {
-            this.elastic.linearVelocity = cc.v2(10, 1000);
+            if (this.elastic.canJump()){
+                this.elastic.linearVelocity = cc.v2(10, 1000);
+            }
         }, this);
     }
 
@@ -39,6 +41,8 @@ export default class ParticleTest extends cc.Component {
         // let color = new cc.Color(Math.min(255, this.time), 100, 0, 255) 
         // this.elastic.setFillColor(color);
         this.jijiao.angle = this.elastic.getAngle();
+        this.jijiao.position = this.elastic.getPointOfElastic();
+        // cc.log("00000000000 %f,%f",pos.x,pos.y);
     }
 
     onDestroy(){

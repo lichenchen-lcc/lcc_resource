@@ -1684,6 +1684,14 @@ declare namespace cc {
 		 * @function 得到当前的旋转角度
 		 */
 		getAngle():number;
+
+		/**
+		 * @function 获取当前小球是否可以跳跃
+		 * @returns boolean
+		 */
+		canJump():boolean;
+
+		getPointOfElastic():Vec2;
 	}
 
 	/** !#en

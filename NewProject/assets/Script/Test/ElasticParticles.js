@@ -44,7 +44,6 @@ var ElasticParticles = cc.Class({
             tooltip: "弹性",
             min: 0.1,
             max: 1,
-            step: 0.1,
         },
         radius: {
             default: 0.7,
@@ -52,7 +51,6 @@ var ElasticParticles = cc.Class({
             tooltip: "半径",
             min: 0.1,
             max: 1,
-            step: 0.1,
         },
         gravityScale: {
             default: 1,
@@ -60,14 +58,20 @@ var ElasticParticles = cc.Class({
             tooltip: "缩放应用再此物体上的重力值",
             min: 0,
             max: 5,
-            step: 0.1,
         },
         density: {
             default: 1,
             tooltip: "密度",
             type: cc.Float,
-            step: 0.1,
             min: 0
+        },
+        fine:{
+            default:0.04,
+            type:cc.Float,
+            tooltip:"粒子的精细程度，值越小越精细，并渲染复杂度",
+            step:0.001,
+            min:0.03,
+            max:0.2,
         },
         // color:{
         //     default: new cc.Color(255, 235, 4, 255),
@@ -140,34 +144,80 @@ var ElasticParticles = cc.Class({
     },
 
     initParticleNodes: function () {
-        let radius = this.radius * this.PTM_RATIO;
+        // let radius = this.radius * this.PTM_RATIO;
         let center = this._particleGroup.GetCenter();
         this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
         // cc.log("this._particleCenterPos x = %f,y = %f ,radius = %f", this._particleCenterPos.x, this._particleCenterPos.y, radius);
         let vertsCount = this._particleSystem.GetParticleCount();//b2ParticleSystem函数，获取粒子数量
         let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         // cc.log("vertsCount : %d", vertsCount);
+        // for (let i = 0; i < vertsCount; i++) {
+        //     let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
+        //     let dis = this._particleCenterPos.sub(pos).mag();
+        //     let difference = Math.abs(dis - radius);
+        //     if (difference <= 1) {
+        //         let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
+        //         let angle = this.getNodeAngle(tempPos);
+        //         // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", tempPos.x, tempPos.y, dis, difference, angle);
+        //         this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
+        //     }
+        // }
+        // this._drawNodes.sort(function (a, b) {
+        //     return a.angle - b.angle;
+        // });
+
+        let tempA = 90;
         for (let i = 0; i < vertsCount; i++) {
-            let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
-            let dis = this._particleCenterPos.sub(pos).mag();
-            let difference = Math.abs(dis - radius);
-            if (difference <= 1) {
-                let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
-                let angle = this.getNodeAngle(tempPos);
-                // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", pos.x, pos.y, dis, difference, angle);
-                this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
+            let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[i].y * this.PTM_RATIO - this._particleCenterPos.y);
+            if (pos.x > 0 && pos.y > 0) {
+                let angle = this.getNodeAngle(pos);
+                if (Math.abs(90 - angle) < tempA) {
+                    tempA = Math.abs(90 - angle);
+                    this._angleIndex = i;
+                    this._initialAnglePos = pos;
+                }
             }
         }
-        this._drawNodes.sort(function (a, b) {
-            return a.angle - b.angle;
-        });
-        //角度
-        this._angleIndex = this._drawNodes[0].index;
-        this._initialAnglePos = new cc.Vec2(this._drawNodes[0].x, this._drawNodes[0].y);
-        this.render();
+        // cc.log("l.llll %d ,%f,%f", this._angleIndex, this._initialAnglePos.x, this._initialAnglePos.y);
     },
 
+    update(dt) {
+        this.synchronizationToNode();
+
+        // this.updateParticleNodes();
+
+        this.render();
+
+        this.updateContacts();
+    },
+
+    /**
+     * @function 用每个粒子来绘制
+     */
     render: function () {
+        if (!this.graphics) {
+            alert("can't found cc.Graphics");
+            return;
+        }
+        let graphics = this.graphics;
+        graphics.clear();
+        let vertsCount = this._particleSystem.GetParticleCount();
+        let posVerts = this._particleSystem.GetPositionBuffer();
+        for (let i = 0; i < vertsCount; i++) {
+            let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
+            let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
+            graphics.fillColor = this._fillColor;
+            graphics.circle(tempPos.x,tempPos.y,(this.fine + 0.02)* this.PTM_RATIO);
+            graphics.lineCap = cc.Graphics.LineCap.ROUND;
+            graphics.lineJoin = cc.Graphics.LineJoin.ROUND;
+        }
+        graphics.fill();
+    },
+
+    /**
+     * @function 用外圈节点绘制当前圆
+     */
+    renderOuterRing:function(){
         if (this._drawNodes.length <= 0) {
             alert("can't found nodes");
             return;
@@ -233,7 +283,7 @@ var ElasticParticles = cc.Class({
         }
 
         var psd = new b2.ParticleSystemDef();
-        psd.radius = 0.04;//粒子的精细度
+        psd.radius = this.fine;//粒子的精细度
         psd.elasticStrength = this.elastic;//恢复弹性粒子群的形状较大值增加弹性粒子速度
         cc.director.getPhysicsManager()._particle = this._world.CreateParticleSystem(psd);
         this._particleSystem = cc.director.getPhysicsManager()._particle;
@@ -285,17 +335,15 @@ var ElasticParticles = cc.Class({
         return new b2.Vec2((cc.winSize.width / 2 + pos.x) / this.PTM_RATIO, (cc.winSize.height / 2 + pos.y) / this.PTM_RATIO);
     },
 
+    /**
+     * @function 更新外圈节点的位置
+     */
     updateParticleNodes: function () {
-        let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
-        //更新中心点坐标
-        let center = this._particleGroup.GetCenter();
-        this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
-
-
-        //更新this.node.position
-        this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2);
-
+        if (this._drawNodes.length <= 0){
+            return;
+        }
         // cc.log("this.node.position  x = %f,y=%f", this.node.position.x, this.node.position.y);
+        let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         for (let i = 0; i < this._drawNodes.length; i++) {
             let node = this._drawNodes[i];
             if (posVerts[node.index]) {
@@ -305,16 +353,6 @@ var ElasticParticles = cc.Class({
             node.x = pos.x;
             node.y = pos.y;
         }
-
-        //同步角度
-        let tempPos = new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
-        let angle1 = this._initialAnglePos.angle(tempPos) * 180 / Math.PI;
-        let angle2 = this._initialAnglePos.signAngle(tempPos) * 180 / Math.PI;
-        // cc.log("angle1 angle1 %f,%f", angle1, angle2);
-
-        this._angle = angle2 || 0;
-
-        this.render();
     },
 
     findInContactMng:function(key){
@@ -326,26 +364,39 @@ var ElasticParticles = cc.Class({
         return false;
     },
 
-    update(dt) {
-        if (this._drawNodes.length > 0) {
-            this.updateParticleNodes();
-        }
+    /**
+     * @function 同步坐标和角度到当前的node节点
+     */
+    synchronizationToNode:function(){
+        //更新中心点坐标
+        let center = this._particleGroup.GetCenter();
+        this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
+        
+        //更新this.node.position
+        this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2);
 
+        //同步角度
+        let posVerts = this._particleSystem.GetPositionBuffer();
+        let tempPos = new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
+        // let angle1 = this._initialAnglePos.angle(tempPos) * 180 / Math.PI;
+        let angle2 = this._initialAnglePos.signAngle(tempPos) * 180 / Math.PI;
+        // cc.log("angle1 angle1 %f,%f", angle1, angle2);
+
+        this._angle = angle2 || 0;
+    },
+
+    /**
+     * @function 更新当前碰撞节点
+     */
+    updateContacts:function(){
         //b2ParticleBodyContact
         let count = this._particleSystem.GetBodyContactCount();
-        // cc.log("count  %d", count);
-
         if (count > 0) {
             let contacts = this._particleSystem.GetBodyContacts();
 
             for (let i = 0; i < count; i++) {
                 let contact = contacts[i];
-                // console.log("pengzhuang" + contact.fixture.collider.node.name);
                 if (contact.fixture.collider){
-                    // let name = contact.fixture.collider.node.name;
-                    // if (name.indexOf("bee") >= 0){
-                    //     console.log("8888" + name);
-                    // }
                     let contactTemp = this.findInContactMng(contact.fixture.collider.node.name);
                     if (!contactTemp){
                         let normalVector = new cc.Vec2(contact.normal.x * this.PTM_RATIO, contact.normal.y * this.PTM_RATIO);
@@ -371,7 +422,6 @@ var ElasticParticles = cc.Class({
                     }
                 }
             }
-
         }else{
             // cc.log("null   null ")
             for (let key in this._contactManager) {
@@ -383,15 +433,12 @@ var ElasticParticles = cc.Class({
                 }
             }
         }
-
         //清空引用计数
         for (let key in this._contactManager) {
             if (this._contactManager[key]) {
                 this._contactManager[key].reference = 0;
             }
         }
-        // let a = 0;
-
     },
 
     onDestroy() {
@@ -458,5 +505,25 @@ ElasticParticles.prototype.registerEndedContact = function (listener, caller) {
         this._contactCaller = caller;
     }
 };
+
+ElasticParticles.prototype.canJump = function(){
+    if (this._contactManager.length > 0 ){
+        for (let index = 0; index < this._contactManager.length; index++) {
+            const contact = this._contactManager[index];
+            // cc.log("contact.normal.y" + contact.normal.y);
+            if(contact.normal.y > 0){
+                return false;
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
+ElasticParticles.prototype.getPointOfElastic = function(){
+    let posVerts = this._particleSystem.GetPositionBuffer();
+    return new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
+}
 
 module.exports = ElasticParticles;
