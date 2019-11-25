@@ -1648,7 +1648,7 @@ declare namespace cc {
 		 * @function 对粒子添加受力，这个与density(密度)有关，密度越小效果越明显
 		 * @param force 受力 
 		 */
-		applyForce(force:cc.Vec2): void;
+		applyForce(force: cc.Vec2): void;
 
 		/**
 		 * @function 添加软体碰撞首次回调
@@ -1661,7 +1661,7 @@ declare namespace cc {
             let nodeName = collider.node.name;
         },this);
 		 */
-		registerBeginContact(listener:Function, caller:any):void;
+		registerBeginContact(listener: Function, caller: any): void;
 		/**
 		 * @function 添加软体碰撞结束回调
 		 * @param listener 回调方法
@@ -1672,26 +1672,40 @@ declare namespace cc {
             let a = 0;
         },this);
 			*/
-		registerEndedContact(listener:Function, caller:any):void;
+		registerEndedContact(listener: Function, caller: any): void;
 
 		/**
 		 * @function 修改填充颜色
 		 * @param color 
 		 */
-		setFillColor(color:Color):void;
+		setFillColor(color: Color): void;
 
 		/**
 		 * @function 得到当前的旋转角度
 		 */
-		getAngle():number;
+		getAngle(): number;
 
 		/**
 		 * @function 获取当前小球是否可以跳跃
 		 * @returns boolean
 		 */
-		canJump():boolean;
+		canJump(): boolean;
 
-		getPointOfElastic():Vec2;
+		/**
+		 * @function 获取软体上的某个点（初始化时在中心上方）
+		 */
+		getPointOfElastic(): Vec2;
+
+		/**
+		 * @function 修改软体的半径
+		 * @param radius 修改的半径
+		 * @param fine 粒子精细度（可选）
+		 * @param elastic 弹性（可选）
+		 * @param density 密度（可选）
+		 * @param damping 阻尼（可选）
+		 * @param gravityScale 重力缩放（可选）
+		 */
+		changeRadius(radius: number, fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number): void;
 	}
 
 	/** !#en

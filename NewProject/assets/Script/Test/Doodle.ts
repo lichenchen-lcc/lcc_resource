@@ -191,8 +191,8 @@ export default class Doodle extends cc.Component {
         // yc += this.node.position.y;
 
         graphics.moveTo(xc, yc);
-        graphics.lineCap = cc.Graphics.LineCap.ROUND;
-        graphics.lineJoin = cc.Graphics.LineJoin.ROUND;
+        // graphics.lineCap = cc.Graphics.LineCap.SQUARE;
+        // graphics.lineJoin = cc.Graphics.LineJoin.ROUND;
         graphics.strokeColor = cc.Color.RED;//线段颜色
         graphics.fillColor = cc.Color.YELLOW;
         graphics.lineWidth = 5

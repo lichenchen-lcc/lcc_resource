@@ -4,17 +4,23 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class ParticleTest extends cc.Component {
     @property(cc.Button)
-    button:cc.Button;
+    jumpBtn:cc.Button;
+    @property(cc.Button)
+    changeSize:cc.Button;
     @property(cc.Node)
     jijiao:cc.Node;
+
+    // @property(dragonBones.ArmatureDisplay)
+    // dragon:dragonBones.ArmatureDisplay;
 
     elastic:cc.ElasticParticles;
     time:number = 0;
 
     onLoad(){
+        // this.dragon.playAnimation("totem_stand",-1)
         this.elastic = this.getComponent("ElasticParticles");
         this.elastic.linearVelocity = cc.v2(100, 0);
-        this.elastic.setFillColor(cc.Color.WHITE);
+        this.elastic.setFillColor(cc.color(255,255,255,100));
         this.elastic.registerBeginContact((collider, normal) => {
             let vector = normal;
             let nodeName = collider.node.name;
@@ -24,9 +30,14 @@ export default class ParticleTest extends cc.Component {
             let a = 0;
         }, this);
 
-        this.button.node.on(cc.Node.EventType.TOUCH_START, () => {
+        this.jumpBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
             if (this.elastic.canJump()){
                 this.elastic.linearVelocity = cc.v2(10, 1000);
+            }
+        }, this);
+        this.changeSize.node.on(cc.Node.EventType.TOUCH_START, () => {
+            if(this.elastic){
+                this.elastic.changeRadius(0.5);
             }
         }, this);
     }

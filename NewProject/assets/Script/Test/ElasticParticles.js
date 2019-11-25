@@ -34,6 +34,11 @@ var Contact = cc.Class({
     }
 });
 
+var renderType = cc.Enum({
+    // OUTERRING:0,
+    EACHPARTICLE:1,
+});
+
 var ElasticParticles = cc.Class({
     extends: cc.Component,
 
@@ -50,7 +55,7 @@ var ElasticParticles = cc.Class({
             type: cc.Float,
             tooltip: "半径",
             min: 0.1,
-            max: 1,
+            max: 2,
         },
         gravityScale: {
             default: 1,
@@ -73,11 +78,6 @@ var ElasticParticles = cc.Class({
             min:0.03,
             max:0.2,
         },
-        // color:{
-        //     default: new cc.Color(255, 235, 4, 255),
-        //     // type:cc.Color,
-        //     tooltip:"软体颜色"
-        // },
         damping :{
             default: 0,
             type: cc.Float,
@@ -85,6 +85,11 @@ var ElasticParticles = cc.Class({
             min: 0,
             max: 2,
             step: 0.1,
+        },
+        render:{
+            default:renderType.EACHPARTICLE,
+            type:cc.Enum(renderType),
+            tooltip:"修改渲染方式"
         },
         isDebug: {
             default: false,
@@ -119,6 +124,9 @@ var ElasticParticles = cc.Class({
 
 
     onLoad() {
+        if (!cc.director.getPhysicsManager().enabled){
+            cc.director.getPhysicsManager().enabled = true;
+        }
         this.graphics = this.getComponent(cc.Graphics);
         this._particleCenterPos = new cc.Vec2(cc.winSize.width / 2 + this.node.position.x, cc.winSize.height / 2 + this.node.position.y);
         this.createParticles();
@@ -144,27 +152,30 @@ var ElasticParticles = cc.Class({
     },
 
     initParticleNodes: function () {
-        // let radius = this.radius * this.PTM_RATIO;
         let center = this._particleGroup.GetCenter();
         this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
         // cc.log("this._particleCenterPos x = %f,y = %f ,radius = %f", this._particleCenterPos.x, this._particleCenterPos.y, radius);
         let vertsCount = this._particleSystem.GetParticleCount();//b2ParticleSystem函数，获取粒子数量
         let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         // cc.log("vertsCount : %d", vertsCount);
-        // for (let i = 0; i < vertsCount; i++) {
-        //     let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
-        //     let dis = this._particleCenterPos.sub(pos).mag();
-        //     let difference = Math.abs(dis - radius);
-        //     if (difference <= 1) {
-        //         let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
-        //         let angle = this.getNodeAngle(tempPos);
-        //         // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", tempPos.x, tempPos.y, dis, difference, angle);
-        //         this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
-        //     }
-        // }
-        // this._drawNodes.sort(function (a, b) {
-        //     return a.angle - b.angle;
-        // });
+        if (this.render == renderType.OUTERRING){
+            this._drawNodes.length = 0;
+            let radius = this.radius * this.PTM_RATIO;
+            for (let i = 0; i < vertsCount; i++) {
+                let pos = new cc.Vec2(posVerts[i].x * this.PTM_RATIO, posVerts[i].y * this.PTM_RATIO);
+                let dis = this._particleCenterPos.sub(pos).mag();
+                let difference = Math.abs(dis - radius);
+                if (difference <= 1) {
+                    let tempPos = new cc.Vec2(pos.x - this._particleCenterPos.x, pos.y - this._particleCenterPos.y);
+                    let angle = this.getNodeAngle(tempPos);
+                    // cc.log("posVerts x=%f,y=%f, dis = %f,difference = %f,angel = %f", tempPos.x, tempPos.y, dis, difference, angle);
+                    this._drawNodes.push(new DrawNode(tempPos.x, tempPos.y, i, angle));
+                }
+            }
+            this._drawNodes.sort(function (a, b) {
+                return a.angle - b.angle;
+            });
+        }
 
         let tempA = 90;
         for (let i = 0; i < vertsCount; i++) {
@@ -184,17 +195,20 @@ var ElasticParticles = cc.Class({
     update(dt) {
         this.synchronizationToNode();
 
-        // this.updateParticleNodes();
+        if(this.render == renderType.OUTERRING){
+            this.updateParticleNodes();
+            this.renderOuterRing();
+        }else if(this.render == renderType.EACHPARTICLE){
+            this.renderEachParticle();
 
-        this.render();
-
+        }
         this.updateContacts();
     },
 
     /**
      * @function 用每个粒子来绘制
      */
-    render: function () {
+    renderEachParticle: function () {
         if (!this.graphics) {
             alert("can't found cc.Graphics");
             return;
@@ -218,12 +232,11 @@ var ElasticParticles = cc.Class({
      * @function 用外圈节点绘制当前圆
      */
     renderOuterRing:function(){
-        if (this._drawNodes.length <= 0) {
-            alert("can't found nodes");
-            return;
-        }
         if (!this.graphics) {
             alert("can't found cc.Graphics");
+            return;
+        }
+        if (this._drawNodes.length <= 0) {
             return;
         }
         let graphics = this.graphics;
@@ -244,10 +257,10 @@ var ElasticParticles = cc.Class({
         graphics.moveTo(xc, yc);
         graphics.lineCap = cc.Graphics.LineCap.ROUND;
         graphics.lineJoin = cc.Graphics.LineJoin.ROUND;
-        graphics.strokeColor = this._fillColor;//线段颜色
+        graphics.strokeColor = cc.Color.WHITE;//线段颜色
         graphics.fillColor = this._fillColor;
         // cc.log("this._fillColor  %d,%d,%d,%d", this._fillColor.r, this._fillColor.g, this._fillColor.b, this._fillColor.a);
-        graphics.lineWidth = 5
+        graphics.lineWidth = 2
 
         // Draw through N points
         for (var N = 0; N < nodes.length; N++) {
@@ -268,7 +281,6 @@ var ElasticParticles = cc.Class({
     createParticles: function () {
         let winSize = cc.winSize;
 
-        cc.director.getPhysicsManager().enabled = true;
         this._world = cc.director.getPhysicsManager()._world;
         this._world.SetAllowSleeping(true);
         this._world.SetContinuousPhysics(true);
@@ -368,9 +380,12 @@ var ElasticParticles = cc.Class({
      * @function 同步坐标和角度到当前的node节点
      */
     synchronizationToNode:function(){
+        
         //更新中心点坐标
-        let center = this._particleGroup.GetCenter();
-        this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
+        if(this._particleGroup){
+            let center = this._particleGroup.GetCenter();
+            this._particleCenterPos = new cc.Vec2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
+        }
         
         //更新this.node.position
         this.node.position = new cc.Vec2(this._particleCenterPos.x - cc.winSize.width / 2, this._particleCenterPos.y - cc.winSize.height / 2);
@@ -444,15 +459,15 @@ var ElasticParticles = cc.Class({
     onDestroy() {
         if (this._particleGroup) {
             this._particleGroup.DestroyParticles();
-            this._particleSystem = null;
-            cc.director.getPhysicsManager()._particle = null;
-            this._onBeginContact = null;
-            this._onEndedContact = null;
-            this._contactCaller = null;
-            this._contactManager = null;
+            this._particleGroup = null;
         }
+        this._particleSystem = null;
+        cc.director.getPhysicsManager()._particle = null;
+        this._onBeginContact = null;
+        this._onEndedContact = null;
+        this._contactCaller = null;
+        this._contactManager = null;
     }
-
     // update (dt) {},
 });
 
@@ -524,6 +539,30 @@ ElasticParticles.prototype.canJump = function(){
 ElasticParticles.prototype.getPointOfElastic = function(){
     let posVerts = this._particleSystem.GetPositionBuffer();
     return new cc.Vec2(posVerts[this._angleIndex].x * this.PTM_RATIO - this._particleCenterPos.x, posVerts[this._angleIndex].y * this.PTM_RATIO - this._particleCenterPos.y)
+}
+
+ElasticParticles.prototype.changeRadius = function(radius,fine,elastic,density,damping,gravityScale){
+    if (this._particleGroup){
+        this._particleGroup.DestroyParticles();
+    }
+    this.radius = radius;
+    if(fine){
+        this.fine = fine;
+    }
+    if(elastic){
+        this.elastic = elastic;
+    }
+    if(density){
+        this.density = density;
+    }
+    if(damping){
+        this.damping = damping;
+    }
+    if(gravityScale){
+        this.gravityScale = gravityScale;
+    }
+    this.createParticles();
+    this.initParticleNodes();
 }
 
 module.exports = ElasticParticles;
