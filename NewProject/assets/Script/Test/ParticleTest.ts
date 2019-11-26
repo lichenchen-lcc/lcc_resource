@@ -7,6 +7,8 @@ export default class ParticleTest extends cc.Component {
     jumpBtn:cc.Button;
     @property(cc.Button)
     changeSize:cc.Button;
+    @property(cc.Button)
+    splitBtn:cc.Button;
     @property(cc.Node)
     jijiao:cc.Node;
 
@@ -38,6 +40,11 @@ export default class ParticleTest extends cc.Component {
         this.changeSize.node.on(cc.Node.EventType.TOUCH_START, () => {
             if(this.elastic){
                 this.elastic.changeRadius(0.5);
+            }
+        }, this);
+        this.splitBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
+            if(this.elastic){
+                this.elastic.split();
             }
         }, this);
     }

@@ -315,6 +315,7 @@ var ElasticParticles = cc.Class({
         let pos = this.nodePosToParticle(this.node.position);
         pd.position.Set(pos.x, pos.y);
         pd.color.Set(255, 0, 0, 255);
+        // pd.stride = 0.1;
         this._particleGroup = this._particleSystem.CreateParticleGroup(pd);
 
         let groundBodyDef = new b2.BodyDef();
@@ -563,6 +564,13 @@ ElasticParticles.prototype.changeRadius = function(radius,fine,elastic,density,d
     }
     this.createParticles();
     this.initParticleNodes();
+}
+
+ElasticParticles.prototype.split = function(){
+    if (this._particleGroup && this._particleSystem){
+        this._particleSystem.SplitParticleGroup(this._particleGroup);
+        
+    }
 }
 
 module.exports = ElasticParticles;

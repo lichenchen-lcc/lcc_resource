@@ -1639,6 +1639,13 @@ declare namespace cc {
 	 * @class 软体碰撞系统
 	 */
 	export class ElasticParticles extends cc.Component {
+		radius: number;
+		fine: number; 
+		elastic: number; 
+		density: number; 
+		damping: number;
+		gravityScale: number;
+
 		/**
 		 * 改变粒子的速度，这个与density(密度)有关，密度越小效果越明显
 		 */
@@ -1706,6 +1713,8 @@ declare namespace cc {
 		 * @param gravityScale 重力缩放（可选）
 		 */
 		changeRadius(radius: number, fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number): void;
+
+		split():void;
 	}
 
 	/** !#en
