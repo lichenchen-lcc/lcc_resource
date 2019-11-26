@@ -44,7 +44,7 @@ export default class ParticleTest extends cc.Component {
         }, this);
         this.splitBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
             if(this.elastic){
-                this.elastic.split();
+                // this.elastic.split();
             }
         }, this);
     }

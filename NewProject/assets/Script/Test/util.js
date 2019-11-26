@@ -1,39 +1,38 @@
+b2.Draw.prototype.DrawParticles = function (positionBuffer, radius, colorBuffer, particleCount) {
+    // console.log("----------b2.Draw.prototype.DrawParticles");
 
-const ShaderMaterial = require("ShaderMaterial");
+    let temp_vec2 = cc.v2(0, 0)
+    let PTM_RATIO = 32;
+    let drawer = this._drawer;
+    for (let i = 0; i < particleCount; i += 3) {
 
-//工具类
-var util = {};
-util.useShader = function (sprite, lab) {
-    if (cc.game.renderType === cc.game.RENDER_TYPE_CANVAS) {
-        console.warn('Shader not surpport for canvas');
-        return;
-    }
-    if (!sprite || !sprite.spriteFrame || sprite.lab == lab) {
-        return;
-    }
-    if (lab) {
-        if (lab.vert == null || lab.frag == null) {
-            console.warn('Shader not defined', lab);
-            return;
-        }
-        cc.dynamicAtlasManager.enabled = false;
+        b2.Transform.MulXV(this._xf, positionBuffer[i], temp_vec2);
+        let x = temp_vec2.x * PTM_RATIO;
+        let y = temp_vec2.y * PTM_RATIO;
 
-        let material = new ShaderMaterial();
-        let name = lab.name ? lab.name : "None"
-        material.callfunc(name, lab.vert, lab.frag, lab.defines || []);
-
-        let texture = sprite.spriteFrame.getTexture();
-        material.setTexture(texture);
-        material.updateHash();
-
-        sprite._material = material;
-        sprite._renderData.material = material;
-        sprite.lab = lab;
-        return material;
-    } else {
-        // 这个就是直接变成灰色
-        sprite.setState(1);
+        drawer.circle(x, y, 2);
     }
 }
 
-module.exports = util;
+//node解构
+function DrawNode(x, y, index, angle) {
+    this.x = x;
+    this.y = y;
+    this.index = index;
+    this.angle = angle;
+}
+function Contact(collider, normal) {
+    this.collider = collider;
+    this.normal = normal; 
+    this.reference = 0;
+    this.key = collider.node.name;
+}
+
+var RenderType = cc.Enum({
+    // OUTERRING:0,
+    EACHPARTICLE:1,
+});
+
+module.exports.DrawNode = DrawNode;
+module.exports.Contact = Contact;
+module.exports.RenderType = RenderType;

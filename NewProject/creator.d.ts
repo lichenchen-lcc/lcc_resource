@@ -1713,8 +1713,6 @@ declare namespace cc {
 		 * @param gravityScale 重力缩放（可选）
 		 */
 		changeRadius(radius: number, fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number): void;
-
-		split():void;
 	}
 
 	/** !#en

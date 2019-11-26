@@ -1,43 +1,7 @@
-
-b2.Draw.prototype.DrawParticles = function (positionBuffer, radius, colorBuffer, particleCount) {
-    // console.log("----------b2.Draw.prototype.DrawParticles");
-
-    let temp_vec2 = cc.v2(0, 0)
-    let PTM_RATIO = 32;
-    let drawer = this._drawer;
-    for (let i = 0; i < particleCount; i += 3) {
-
-        b2.Transform.MulXV(this._xf, positionBuffer[i], temp_vec2);
-        let x = temp_vec2.x * PTM_RATIO;
-        let y = temp_vec2.y * PTM_RATIO;
-
-        drawer.circle(x, y, 2);
-    }
-}
-
-//node解构
-var DrawNode = cc.Class({
-    ctor: function (x, y, index, angle) {
-        this.x = x;
-        this.y = y;
-        this.index = index;
-        this.angle = angle;
-    },
-});
-
-var Contact = cc.Class({
-    ctor: function (collider, normal) {
-        this.collider = collider;
-        this.normal = normal; 
-        this.reference = 0;
-        this.key = collider.node.name;
-    }
-});
-
-var renderType = cc.Enum({
-    // OUTERRING:0,
-    EACHPARTICLE:1,
-});
+let util = require('./util');
+let DrawNode = util.DrawNode;
+let Contact = util.Contact;
+let RenderType = util.RenderType;
 
 var ElasticParticles = cc.Class({
     extends: cc.Component,
@@ -87,8 +51,8 @@ var ElasticParticles = cc.Class({
             step: 0.1,
         },
         render:{
-            default:renderType.EACHPARTICLE,
-            type:cc.Enum(renderType),
+            default:RenderType.EACHPARTICLE,
+            type:cc.Enum(RenderType),
             tooltip:"修改渲染方式"
         },
         isDebug: {
@@ -158,7 +122,7 @@ var ElasticParticles = cc.Class({
         let vertsCount = this._particleSystem.GetParticleCount();//b2ParticleSystem函数，获取粒子数量
         let posVerts = this._particleSystem.GetPositionBuffer();//b2ParticleSystem函数，获取粒子位置数组
         // cc.log("vertsCount : %d", vertsCount);
-        if (this.render == renderType.OUTERRING){
+        if (this.render == RenderType.OUTERRING){
             this._drawNodes.length = 0;
             let radius = this.radius * this.PTM_RATIO;
             for (let i = 0; i < vertsCount; i++) {
@@ -195,10 +159,10 @@ var ElasticParticles = cc.Class({
     update(dt) {
         this.synchronizationToNode();
 
-        if(this.render == renderType.OUTERRING){
+        if(this.render == RenderType.OUTERRING){
             this.updateParticleNodes();
             this.renderOuterRing();
-        }else if(this.render == renderType.EACHPARTICLE){
+        }else if(this.render == RenderType.EACHPARTICLE){
             this.renderEachParticle();
 
         }
@@ -297,8 +261,7 @@ var ElasticParticles = cc.Class({
         var psd = new b2.ParticleSystemDef();
         psd.radius = this.fine;//粒子的精细度
         psd.elasticStrength = this.elastic;//恢复弹性粒子群的形状较大值增加弹性粒子速度
-        cc.director.getPhysicsManager()._particle = this._world.CreateParticleSystem(psd);
-        this._particleSystem = cc.director.getPhysicsManager()._particle;
+        this._particleSystem = this._world.CreateParticleSystem(psd);
         this._particleSystem.SetGravityScale(this.gravityScale);
         this._particleSystem.SetDensity(this.density);
         this._particleSystem.SetDamping(this.damping);
@@ -463,7 +426,6 @@ var ElasticParticles = cc.Class({
             this._particleGroup = null;
         }
         this._particleSystem = null;
-        cc.director.getPhysicsManager()._particle = null;
         this._onBeginContact = null;
         this._onEndedContact = null;
         this._contactCaller = null;
