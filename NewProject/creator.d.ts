@@ -1706,13 +1706,25 @@ declare namespace cc {
 		/**
 		 * @function 修改软体的半径
 		 * @param radius 修改的半径
+		 */
+		changeRadius(radius: number): void;
+
+		/**
+		 * @function 设置当前属性
 		 * @param fine 粒子精细度（可选）
 		 * @param elastic 弹性（可选）
 		 * @param density 密度（可选）
 		 * @param damping 阻尼（可选）
 		 * @param gravityScale 重力缩放（可选）
 		 */
-		changeRadius(radius: number, fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number): void;
+		setProperty(fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number):void;
+
+		/**
+		 * @function 分裂方法
+		 * @param positions 分裂子软体的位置
+		 * @param radius 软体的半径
+		 */
+		split(positions:Vec2[], radius?:number = 20):void;
 	}
 
 	/** !#en
