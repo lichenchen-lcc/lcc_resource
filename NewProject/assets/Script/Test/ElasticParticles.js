@@ -69,21 +69,24 @@ var ElasticParticles = cc.Class({
         this._world = null;
         this._particleSystem = null;
         this._particleGroup = null;
-
-        this._drawNodes = new Array();
+        
+        this._drawNodes = [];
         this._particleCenterPos = new cc.Vec2(0, 0);
-
+        
         this._onBeginContact = null;
         this._onEndedContact = null;
         this._contactCaller = null;
-
+        
         this._angleIndex = 0;
         this._initialAnglePos = new cc.Vec2(0, 0);
         this._angle = 0;
-
+        
         this._fillColor = cc.Color.YELLOW;
-
-        this._contactManager = new Array();
+        
+        this._contactManager = [];
+        
+        this._splitGroups = [];
+        this._splitRadius = 0;
     },
 
 
@@ -285,6 +288,7 @@ var ElasticParticles = cc.Class({
         var psd = new b2.ParticleSystemDef();
         psd.radius = this.fine;//粒子的精细度
         psd.elasticStrength = this.elastic;//恢复弹性粒子群的形状较大值增加弹性粒子速度
+        // psd.surfaceTensionNormalStrength = 0.2;
         if (cc.director.getPhysicsManager()._particle){
             this._world.DestroyParticleSystem(cc.director.getPhysicsManager()._particle);
         }
@@ -408,7 +412,7 @@ var ElasticParticles = cc.Class({
                     }
                 }
             }
-            for (let key in this._contactManager) {
+            for (let key = this._contactManager.length - 1; key >= 0; key--) {
                 if (this._contactManager[key]) {
                     if (this._contactManager[key].reference == 0) {
                         if (this._onEndedContact) {
@@ -420,7 +424,7 @@ var ElasticParticles = cc.Class({
             }
         } else {
             // cc.log("null   null ")
-            for (let key in this._contactManager) {
+            for (let key = this._contactManager.length - 1; key >= 0; key--) {
                 if (this._contactManager[key]) {
                     if (this._onEndedContact) {
                         this._onEndedContact.call(this._contactCaller, this._contactManager[key].collider, this._contactManager[key].normal);
@@ -442,11 +446,16 @@ var ElasticParticles = cc.Class({
             this._particleGroup.DestroyParticles();
             this._particleGroup = null;
         }
+        if(cc.director.getPhysicsManager()._particle){
+            this._world.DestroyParticleSystem(cc.director.getPhysicsManager()._particle);
+        }
         this._particleSystem = null;
         this._onBeginContact = null;
         this._onEndedContact = null;
         this._contactCaller = null;
         this._contactManager = null;
+        this._splitGroups = null;
+        this._drawNodes = null;
     }
     // update (dt) {},
 });
@@ -525,6 +534,7 @@ ElasticParticles.prototype.changeRadius = function (radius) {
     if (this._particleGroup) {
         this._particleGroup.DestroyParticles();
     }
+    this.node.position = cc.v2(this.node.position.x, this.node.position.y + (radius - this.radius));
     this.radius = radius;
     this.createParticles(true);
     this.initParticleNodes();
@@ -548,21 +558,71 @@ ElasticParticles.prototype.setProperty = function (fine, elastic, density, dampi
     }
 }
 
-ElasticParticles.prototype.split = function (positions, radius) {
+ElasticParticles.prototype.split = function (positions, radius,offsetR) {
+    if (positions == null || positions.length <= 0){
+        return;
+    }
     if (this._particleGroup) {
         this._particleGroup.DestroyParticles();
     }
-    this.radius = radius + 3.2;
-    this.createParticles(false);
+    this._splitRadius = radius;
+    //增加分裂时主体的大小
+    if (offsetR){
+        this.radius = this._splitRadius + offsetR;
+    }else{
+        this.radius = this._splitRadius + 3.2;//增加分裂时主体的大小
+    }
+    this.createParticles(true);
+    this._splitGroups.length = 0;
     for (let index = 0; index < positions.length; index++) {
         let pos = this.nodePosToParticle(positions[index]);
-        if (index == 0) {
-            this._particleGroup = this.createParticleGroup(pos, this.radius/this.PTM_RATIO);
-        } else {
-            this.createParticleGroup(pos, radius/this.PTM_RATIO);
-        }
+        this._splitGroups.push(this.createParticleGroup(pos, this._splitRadius/this.PTM_RATIO));
     }
     this.initParticleNodes();
+    //清空旧的碰撞信息
+    this._contactManager.length = 0;
+}
+
+ElasticParticles.prototype.merge = function (forceRatio,step) {
+    let count = this._splitGroups.length;
+    if (count <= 0) {
+        cc.log("当前不需要合并！");
+        return;
+    }
+    let center = this._particleGroup.GetCenter();
+    center = cc.v2(center.x * this.PTM_RATIO, center.y * this.PTM_RATIO);
+    // cc.log("center %f,%f", center.x, center.y);
+    let positions = [];
+    let tempStep = 0;
+    for (let index = this._splitGroups.length - 1; index >= 0; index--) {
+        let pos = this._splitGroups[index].GetCenter();
+        pos = cc.v2(pos.x * this.PTM_RATIO, pos.y * this.PTM_RATIO);
+        let dis = pos.sub(center).mag();
+        if (dis <= (this._splitRadius + this.radius)) {
+            tempStep = tempStep + step + 8;
+            this._splitGroups[index].DestroyParticles();
+            this._splitGroups.splice(index, 1);
+        } else {
+            positions.push(cc.v2(pos.x / this.PTM_RATIO, pos.y / this.PTM_RATIO));
+            //给子软体添加力
+            let force = center.sub(pos).normalizeSelf().scale(cc.v2(forceRatio, forceRatio));
+            this._splitGroups[index].ApplyForce(force);
+        }
+        // cc.log("pos %f,%f,%f", pos.x, pos.y,dis);
+    }
+    if (tempStep > 0) {
+        this.radius = this.radius + tempStep;
+        this.node.position = cc.v2(this.node.position.x, this.node.position.y + tempStep);
+        this.createParticles(true);
+        this._splitGroups.length = 0;
+        for (let i = 0; i < positions.length; i++) {
+            this._splitGroups.push(this.createParticleGroup(positions[i], this._splitRadius / this.PTM_RATIO));
+        }
+        this.initParticleNodes();
+        //清空旧的碰撞信息
+        this._contactManager.length = 0;
+    }
+    cc.log("GetParticleGroupCount () " + this._particleSystem.GetParticleGroupCount() );
 }
 
 module.exports = ElasticParticles;

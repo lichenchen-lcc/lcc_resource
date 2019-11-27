@@ -1720,11 +1720,19 @@ declare namespace cc {
 		setProperty(fine?: number, elastic?: number, density?: number, damping?: number, gravityScale?: number):void;
 
 		/**
-		 * @function 分裂方法
-		 * @param positions 分裂子软体的位置
+		 * @function 分裂方法(防止嵌入地形，根据地形修改位置，主体可通过this.node.position修改)
+		 * @param positions 分裂子软体的位置（例如.位置3个，会有4个软体）
 		 * @param radius 软体的半径
+		 * @param offsetR 主体比普通软体大的点数，默认3.2
 		 */
-		split(positions:Vec2[], radius?:number = 20):void;
+		split(positions:Vec2[], radius:number,offsetR?:number):void;
+
+		/**
+		 * @function 合并方法(防止嵌入地形，根据地形修改位置，主体可通过this.node.position修改)
+		 * @param forceRatio 每个软体之间相互吸引力的比率[（0.1 - ∞）* 单位向量]
+		 * @param step 每次变大增长的半径
+		 */
+		merge(forceRatio: number, step: number): void;
 	}
 
 	/** !#en
