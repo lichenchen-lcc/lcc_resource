@@ -14,6 +14,8 @@ export default class ParticleTest extends cc.Component {
     @property(cc.Node)
     jijiao:cc.Node;
 
+    @property(cc.Prefab)
+    animPrefab:cc.Prefab;
     // @property(dragonBones.ArmatureDisplay)
     // dragon:dragonBones.ArmatureDisplay;
 
@@ -24,7 +26,7 @@ export default class ParticleTest extends cc.Component {
         // this.dragon.playAnimation("totem_stand",-1)
         this.elastic = this.getComponent("ElasticParticles");
         this.elastic.linearVelocity = cc.v2(100, 0);
-        this.elastic.setFillColor(cc.color(255,255,255,100));
+        this.elastic.setFillColor(cc.color(255,255,255,255));
         this.elastic.registerBeginContact((collider, normal) => {
             let vector = normal;
             let nodeName = collider.node.name;
@@ -49,13 +51,20 @@ export default class ParticleTest extends cc.Component {
                 let positions = new Array();
                 positions.push(cc.v2(this.node.position.x + 30,this.node.position.y));
                 positions.push(cc.v2(this.node.position.x - 30,this.node.position.y));
+                positions.push(cc.v2(this.node.position.x - 30,this.node.position.y + 30));
+                positions.push(cc.v2(this.node.position.x + 30,this.node.position.y + 30));
                 this.elastic.split(positions,20);
                 // this.elastic.split();
             }
         }, this);
         this.mergeBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
             if(this.elastic){
-                this.elastic.merge(500,6.4);
+                this.elastic.merge(500,6.4,(pos,angle)=>{
+                    let child = cc.instantiate(this.animPrefab);
+                    child.parent = this.node;
+                    child.position = pos
+                    child.angle = angle;
+                },this);
             }
         }, this);
     }

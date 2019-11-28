@@ -1724,15 +1724,40 @@ declare namespace cc {
 		 * @param positions 分裂子软体的位置（例如.位置3个，会有4个软体）
 		 * @param radius 软体的半径
 		 * @param offsetR 主体比普通软体大的点数，默认3.2
+		 * @example  
+		 * this.splitBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
+            if(this.elastic){
+                let positions = new Array();
+                positions.push(cc.v2(this.node.position.x + 30,this.node.position.y));
+                positions.push(cc.v2(this.node.position.x - 30,this.node.position.y));
+                positions.push(cc.v2(this.node.position.x - 30,this.node.position.y + 30));
+                positions.push(cc.v2(this.node.position.x + 30,this.node.position.y + 30));
+                this.elastic.split(positions,20);
+                // this.elastic.split();
+            }
+        }, this);
 		 */
-		split(positions:Vec2[], radius:number,offsetR?:number):void;
+		split(positions: Vec2[], radius: number, offsetR?: number): void;
 
 		/**
 		 * @function 合并方法(防止嵌入地形，根据地形修改位置，主体可通过this.node.position修改)
 		 * @param forceRatio 每个软体之间相互吸引力的比率[（0.1 - ∞）* 单位向量]
 		 * @param step 每次变大增长的半径
+		 * @param animCallback 过度动画回调 返回动作（子节点的位置和角度）
+		 * @param caller 回调对象（this）
+		 * @example 
+		 * this.mergeBtn.node.on(cc.Node.EventType.TOUCH_START, () => {
+            if(this.elastic){
+                this.elastic.merge(500,6.4,(pos,angle)=>{
+                    let child = cc.instantiate(this.animPrefab);
+                    child.parent = this.node;
+                    child.position = pos
+                    child.angle = angle;
+                },this);
+            }
+        }, this);
 		 */
-		merge(forceRatio: number, step: number): void;
+		merge(forceRatio: number, step: number, animCallback?: Function, caller?: any): void;
 	}
 
 	/** !#en

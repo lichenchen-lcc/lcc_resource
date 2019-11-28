@@ -1,0 +1,7 @@
+{
+  "ver": "1.0.0",
+  "uuid": "a5483c65-c419-4d85-a167-14e223bbff92",
+  "atlasJson": "{\"width\":1024,\"imagePath\":\"totem_tex.png\",\"height\":512,\"name\":\"totem\",\"SubTexture\":[{\"width\":360,\"y\":315,\"height\":141,\"name\":\"上\",\"x\":1},{\"width\":137,\"y\":315,\"height\":159,\"name\":\"中\",\"x\":532},{\"width\":72,\"y\":315,\"height\":163,\"name\":\"下\",\"x\":750},{\"width\":167,\"y\":315,\"height\":160,\"name\":\"碎石4\",\"x\":363},{\"width\":77,\"y\":315,\"height\":170,\"name\":\"碎石2\",\"x\":671},{\"width\":711,\"y\":1,\"height\":312,\"name\":\"飞溅土\",\"x\":1}]}",
+  "texture": "aa327c79-8f60-4496-adcf-3d661ab4c479",
+  "subMetas": {}
+}
