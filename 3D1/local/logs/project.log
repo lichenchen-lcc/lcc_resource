@@ -1,0 +1,26 @@
+2019-11-04 15:48:41-log: preferences@1.0.0 enable
+2019-11-04 15:49:19-log: Parse [D:/CocosCreator3D_1.0.0/resources/resources/3d/engine/index.ts] : walk 478  files.
+2019-11-04 15:49:19-log: Parse [D:/CocosCreator3D_1.0.0/resources/resources/3d/engine/index.ts]: 37077.174ms
+2019-11-04 15:49:20-log: QuickCompiler compileFinished: 66.441ms
+2019-11-04 15:49:20-log: QuickCompiler rebuild finished: 37813.552ms
+2019-11-04 15:49:20-log: engine@1.0.0 enable
+2019-11-04 15:49:20-log: asset-db@1.0.0 enable
+2019-11-04 15:49:20-log: console@1.0.0 enable
+2019-11-04 15:49:20-log: scene@1.0.0 enable
+2019-11-04 15:49:20-log: ui-kit@1.0.0 enable
+2019-11-04 15:49:20-log: assets@1.0.0 enable
+2019-11-04 15:49:20-log: inspector@1.0.0 enable
+2019-11-04 15:49:20-log: hierarchy@1.0.0 enable
+2019-11-04 15:49:20-log: packager@1.0.0 enable
+2019-11-04 15:49:20-log: project-setting@1.0.0 enable
+2019-11-04 15:49:20-log: preview@1.0.0 enable
+2019-11-04 15:49:22-log: builder@1.0.0 enable
+2019-11-04 15:49:22-log: animator@1.0.0 enable
+2019-11-04 15:49:22-log: about@1.0.0 enable
+2019-11-04 15:49:22-log: tester@1.0.0 enable
+2019-11-04 15:49:22-log: ipc@1.0.0 enable
+2019-11-04 15:49:22-log: profile@1.0.0 enable
+2019-11-04 15:49:26-warn: [Scene] Sender does not exist
+2019-11-04 15:51:15-warn: The panel(ui-kit.color-picker) does not exist and cannot send a message.
+  message: reset
+  params: 
